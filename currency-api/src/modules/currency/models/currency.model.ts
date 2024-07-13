@@ -14,8 +14,12 @@ export class Currency {
   rate: number;
 }
 
-export type CurrencyDocument = Currency & Document;
 export const CurrencySchema = SchemaFactory.createForClass(Currency);
+export type CurrencyDocument = Document & {
+  id: string;
+  name: string;
+  rate: number;
+};
 
 
 // import * as mongoose from 'mongoose';

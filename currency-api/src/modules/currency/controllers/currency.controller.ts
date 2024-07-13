@@ -19,6 +19,11 @@ export class CurrencyController {
   async getCurrency(@Param('id') id: string) {
     return this.currencyService.getCurrency(id);
   }
+
+  @Get()
+  async getAllCurrencies() {
+    return this.currencyService.getAllCurrencies();
+  }
   
   @Get('convert')
   async convertCurrency(
