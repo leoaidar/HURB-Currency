@@ -1,6 +1,8 @@
-import { Controller, Post, Get, Body, Param, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Query, HttpException, HttpStatus, NotFoundException, UsePipes, ValidationPipe  } from '@nestjs/common';
 import { CurrencyService } from '../services/currency.service';
 import { ExchangeRateService } from '../services/exchange-rate.service';
+import { CreateCurrencyDto } from '../dto/create-currency.dto';
+import { IdParamDto } from '../dto/id-param.dto';
 
 @Controller('currencies')
 export class CurrencyController {
@@ -9,16 +11,21 @@ export class CurrencyController {
     private readonly currencyService: CurrencyService,
     private readonly exchangeRateService: ExchangeRateService
   ) {}
-  
+
   @Post()
-  async addCurrency(@Body() createCurrencyDto: { id: string; name: string; rate: number }) {
-    return this.currencyService.addCurrency(createCurrencyDto.id, createCurrencyDto.name, createCurrencyDto.rate);
+  async addCurrency(@Body() createCurrencyDto: CreateCurrencyDto) {
+    return this.currencyService.addCurrency(createCurrencyDto.name, createCurrencyDto.rate);
   }
 
   @Get(':id')
-  async getCurrency(@Param('id') id: string) {
-    return this.currencyService.getCurrency(id);
-  }
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getCurrency(@Param() params: IdParamDto) {
+    const currency = await this.currencyService.getCurrency(params.id);
+    if (!currency) {
+      throw new NotFoundException(`Currency with ID ${params.id} not found`);
+    }
+    return currency;
+  }  
 
   @Get()
   async getAllCurrencies() {

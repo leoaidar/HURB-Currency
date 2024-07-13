@@ -7,8 +7,8 @@ import { Currency, CurrencyDocument } from '../models/currency.model';
 export class CurrencyService {
   constructor(@InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>) {}
 
-  async addCurrency(id: string, name: string, rate: number): Promise<Currency> {
-    const newCurrency = new this.currencyModel({ id, name, rate });
+  async addCurrency(name: string, rate: number): Promise<Currency> {
+    const newCurrency = new this.currencyModel({ name, rate });
     return await newCurrency.save();
   }
 
