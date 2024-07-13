@@ -8,7 +8,14 @@ export class TransformInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map(data => {
         const { _id, __v, ...result } = data;
-        return result;
+        const viewModel = { 
+          id: data._doc.id, 
+          name: data._doc.name, 
+          rate: data._doc.rate 
+        };
+        console.log('result',result);
+        console.log('viewModel',viewModel);        
+        return viewModel;
       })
     );
   }
