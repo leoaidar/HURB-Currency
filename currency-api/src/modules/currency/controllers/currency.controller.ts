@@ -29,6 +29,7 @@ export class CurrencyController {
   }  
 
   @Get()
+  @UseInterceptors(TransformInterceptor)
   async getAllCurrencies() {
     return this.currencyService.getAllCurrencies();
   }

@@ -13,8 +13,6 @@ export class CurrencyService {
   }
 
   async getCurrency(id: string): Promise<Currency | null> {
-    //this.currencyModel.findOne({ id }).exec();
-    //const currency = await this.currencyModel.findById(id).exec();
     const currency = await this.currencyModel.findOne({ id }).exec();
     if (currency) {
       return currency;
