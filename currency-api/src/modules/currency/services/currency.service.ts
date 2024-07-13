@@ -11,9 +11,14 @@ export class CurrencyService {
     const newCurrency = new this.currencyModel({ name, rate });
     return await newCurrency.save();
   }
-
+  
   async getCurrency(id: string): Promise<Currency | null> {
-    return this.currencyModel.findOne({ id }).exec();
+    const currency = await this.currencyModel.findById(id).exec();
+    if (currency) {
+      const { _id, __v, ...currencyData } = currency.toObject();
+      return currencyData;
+    }
+    return null;
   }
 
   async getAllCurrencies(): Promise<Currency[]> {

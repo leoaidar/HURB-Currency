@@ -1,8 +1,9 @@
-import { Controller, Post, Get, Body, Param, Query, HttpException, HttpStatus, NotFoundException, UsePipes, ValidationPipe  } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Query, HttpException, HttpStatus, NotFoundException, UseInterceptors  } from '@nestjs/common';
 import { CurrencyService } from '../services/currency.service';
 import { ExchangeRateService } from '../services/exchange-rate.service';
 import { CreateCurrencyDto } from '../dto/create-currency.dto';
 import { IdParamDto } from '../dto/id-param.dto';
+import { TransformInterceptor } from '../../../core/interceptors/transform.interceptor';
 
 @Controller('currencies')
 export class CurrencyController {
@@ -18,7 +19,7 @@ export class CurrencyController {
   }
 
   @Get(':id')
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @UseInterceptors(TransformInterceptor)
   async getCurrency(@Param() params: IdParamDto) {
     const currency = await this.currencyService.getCurrency(params.id);
     if (!currency) {
