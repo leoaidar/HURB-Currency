@@ -126,38 +126,46 @@ export class CurrencyController {
     this.logger.log(`Conversion result: ${value}`);
   
     return { value };
-  } 
-
+  }
+   
   @Put('update-rates')
   @ApiOperation({ summary: 'Update currency exchange rates' })
+  @ApiBody({
+    description: 'Optional list of currency codes to update, if empty all will be update.',
+    type: [String],
+    required: false  // Declarar explicito o corpo da requisicao como opcional
+  })
   @ApiResponse({ status: 200, description: 'Exchange rates updated successfully' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 500, description: 'Failed to update exchange rates' })
-  async updateExchangeRates() {
-    // Obter todas as moedas disponíveis no sistema
-    const currencies = await this.currencyService.getAllCurrencies();
+  async updateExchangeRates(@Body() body: { currencySymbols?: string[] } = {}) {
+
+    // Buscar as moedas baseadas nos símbolos enviados ou trazer todas caso veio vazio
+    const currencies = body.currencySymbols?.length ? 
+      await this.currencyService.getCurrenciesBySymbols(body.currencySymbols) :
+      await this.currencyService.getAllCurrencies();
+
     const symbols = currencies.map((c) => c.code);
-  
-    // Buscar taxas de câmbio usando a moeda base USD
+
+    // Buscar as taxas de câmbio usando o Dollar(USD) como moeda base 
     const currenciesRates = await this.exchangeRateService.getExchangeRate('USD', symbols);
-  
-    
     this.logger.log(`Currencies rates retrieved: ${JSON.stringify(currenciesRates)}`);
-    
-    // Verificar se as taxas foram recuperadas com sucesso
+
     if (!currenciesRates || !currenciesRates.rates) {
       this.logger.error('Failed to fetch exchange rates');
-      throw new CurrencyFailedExchangeException();
+      throw new HttpException('Failed to fetch exchange rates', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  
+
     // Atualizar cada moeda com a nova taxa
-    await Promise.all(currencies.map(async (currency) => {
-      const newRate = currenciesRates.rates[currency.code.toLowerCase()]; // Asegure-se de acessar com lowercase para corresponder ao formato da API
-      if (newRate) {        
-        this.logger.log(`Updating ${currency.code.toUpperCase()}, rates: ${newRate}.`);
+    const updates = currencies.map(async (currency) => {
+      const newRate = currenciesRates.rates[currency.code.toLowerCase()];
+      if (newRate) {
+        this.logger.log(`Updating ${currency.code.toUpperCase()}...`);
         return this.currencyService.updateCurrencyRate(currency.id, newRate);
       }
-    }));
-  
+    });
+
+    await Promise.all(updates);
     this.logger.log('Exchange rates updated successfully');
     return { message: 'Exchange rates updated successfully' };
   }
