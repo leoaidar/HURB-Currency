@@ -26,4 +26,4 @@ export type CurrencyDocument = Document & {
   name: string;
   rate: number;
   description: string;
-};
+}; 

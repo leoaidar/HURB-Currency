@@ -15,7 +15,7 @@ import { CurrencyModule } from './modules/currency/currency.module';
       }),
       inject: [ConfigService],
     }),
-    CurrencyModule, // importe somente o CurrencyModule
+    CurrencyModule, // importar somente o CurrencyModule funcionou
   ],
 })
 export class AppModule {}
