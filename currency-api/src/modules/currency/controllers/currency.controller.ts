@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, Query, HttpException, HttpStatus, NotFoundException, UseInterceptors  } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Query, HttpException, HttpStatus, UseInterceptors, Logger } from '@nestjs/common';
 import { CurrencyService } from '../services/currency.service';
 import { ExchangeRateService } from '../services/exchange-rate.service';
 import { CreateCurrencyDto } from '../dto/create-currency.dto';
@@ -6,13 +6,16 @@ import { IdParamDto } from '../dto/id-param.dto';
 import { TransformInterceptor } from '../../../core/interceptors/transform.interceptor';
 import { CurrencyNotFoundException } from 'src/exceptions/currency-not-found.exception';
 import { CurrencyFailedCreateException } from 'src/exceptions/currency-failed-create.exception';
+import { CurrencyFailedExchangeException } from 'src/exceptions/currency-failed-exchange.exception';
 
 @Controller('currencies')
 export class CurrencyController {
 
+  private readonly logger = new Logger(CurrencyController.name);
+
   constructor(
     private readonly currencyService: CurrencyService,
-    private readonly exchangeRateService: ExchangeRateService
+    private readonly exchangeRateService: ExchangeRateService,
   ) {}
     
   @Post()
@@ -20,7 +23,8 @@ export class CurrencyController {
   async addCurrency(@Body() createCurrencyDto: CreateCurrencyDto) {
     try {
       return await this.currencyService.addCurrency(createCurrencyDto.name, createCurrencyDto.rate, createCurrencyDto.description);
-    } catch (error) {      
+    } catch (error) { 
+      this.logger.error('Failed to create currency', error);     
       throw new CurrencyFailedCreateException();
     }
   }  
@@ -29,7 +33,8 @@ export class CurrencyController {
   @UseInterceptors(TransformInterceptor)
   async getCurrency(@Param() params: IdParamDto) {
     const currency = await this.currencyService.getCurrency(params.id);
-    if (!currency) {
+    if (!currency) {      
+      this.logger.error(`Currency not found ${params.id} `);
       throw new CurrencyNotFoundException(params.id);
     }
     return currency;
@@ -58,12 +63,13 @@ export class CurrencyController {
     const symbols = currencies.map(c => c.id);
     const rates = await this.exchangeRateService.getExchangeRate('USD', symbols);
 
-    // Verifica se as taxas foram recuperadas com sucesso
+    // Verificar se as taxas foram recuperadas com sucesso
     if (!rates || !rates.rates) {
-      throw new HttpException('Failed to fetch exchange rates', HttpStatus.INTERNAL_SERVER_ERROR);
+      this.logger.error('Failed to fetch exchange rates');
+      throw new CurrencyFailedExchangeException();      
     }
 
-    // Atualiza cada moeda com a nova taxa
+    // Atualizar cada moeda com a nova taxa
     await Promise.all(currencies.map(async currency => {
       const newRate = rates.rates[currency.id];
       if (newRate) {
@@ -71,7 +77,7 @@ export class CurrencyController {
       }
     }));
 
-    // Retorna uma resposta indicando sucesso
+    this.logger.log('Exchange rates updated successfully');
     return { message: 'Exchange rates updated successfully' };
   }
   
