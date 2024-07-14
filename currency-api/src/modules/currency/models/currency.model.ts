@@ -9,7 +9,7 @@ export class Currency {
   id: string;
 
   @Prop({ required: true })
-  name: string;
+  code: string;
 
   @Prop({ required: true })
   rate: number;
@@ -23,7 +23,7 @@ export const CurrencySchema = SchemaFactory.createForClass(Currency);
 
 export type CurrencyDocument = Document & {
   id: string;
-  name: string;
+  code: string;
   rate: number;
   description: string;
 }; 

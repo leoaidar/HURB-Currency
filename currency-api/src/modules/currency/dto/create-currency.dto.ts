@@ -3,12 +3,12 @@ import { IsNotEmpty, IsString, IsNumber, Min, Length } from 'class-validator';
 export class CreateCurrencyDto {
 
    /**
-    * The currency name
+    * The currency code
     * @example ARTH
     */  
   @IsNotEmpty()
   @IsString()
-  name: string;
+  code: string;
 
    /**
     * The currency description

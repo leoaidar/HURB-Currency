@@ -23,7 +23,7 @@ export class TransformInterceptor implements NestInterceptor {
     // Construir o objeto explicito para garantir a ordem das propriedades
     return {
       id: response.id,
-      name: response.name,
+      code: response.code,
       rate: response.rate,
       description: response.description
     };

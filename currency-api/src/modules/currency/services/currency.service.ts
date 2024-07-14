@@ -10,8 +10,8 @@ export class CurrencyService {
   
   constructor(@InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>) {}
 
-  async addCurrency(name: string, rate: number, description: string): Promise<Currency> {
-    const newCurrency = new this.currencyModel({ name, rate, description });
+  async addCurrency(code: string, rate: number, description: string): Promise<Currency> {
+    const newCurrency = new this.currencyModel({ code, rate, description });
     return await newCurrency.save();
   }
 
@@ -30,6 +30,6 @@ export class CurrencyService {
 
   async updateCurrencyRate(id: string, newRate: number): Promise<Currency | null> {  
     this.logger.log(`Updating currency rate... id: ${id}, rate: ${newRate}`);
-    return this.currencyModel.findByIdAndUpdate(id, { rate: newRate }, { new: true }).exec();
+    return this.currencyModel.findOneAndUpdate({ id: id }, { rate: newRate }, { new: true }).exec();
   }  
 }

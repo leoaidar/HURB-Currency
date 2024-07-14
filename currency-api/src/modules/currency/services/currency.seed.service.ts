@@ -9,11 +9,11 @@ export class CurrencySeedService implements OnModuleInit {
     private readonly logger = new Logger(CurrencySeedService.name);
 
     private readonly currencies: Partial<Currency>[] = [
-        { name: 'USD', description: 'The United States dollar (symbol: $; currency code: USD; also abbreviated US$ to distinguish it from other dollar-denominated currencies; referred to as the dollar, U.S. dollar, American dollar, or colloquially buck) is the official currency of the United States and several other countries.', rate: 1 },
-        { name: 'BRL', description: 'The Brazilian real (pl. reais; sign: R$; code: BRL) is the official currency of Brazil.', rate: 5.7 },               
-        { name: 'EUR', description: 'The euro (symbol: €; currency code: EUR) is the official currency of 20 of the 27 member states of the European Union.', rate: 1.15 },
-        { name: 'BTC', description: 'Bitcoin (abbreviation: BTC; sign: ₿) is the first decentralized cryptocurrency. Nodes in the peer-to-peer bitcoin network verify transactions through cryptography and record them in a public distributed ledger, called a blockchain, without central oversight.', rate: 100 },
-        { name: 'ETH', description: 'Ethereum is a decentralized blockchain with smart contract functionality. Ether (Abbreviation: ETH;[a]) is the native cryptocurrency of the platform.', rate: 10 },
+        { code: 'USD', description: 'The United States dollar (symbol: $; currency code: USD; also abbreviated US$ to distinguish it from other dollar-denominated currencies; referred to as the dollar, U.S. dollar, American dollar, or colloquially buck) is the official currency of the United States and several other countries.', rate: 1 },
+        { code: 'BRL', description: 'The Brazilian real (pl. reais; sign: R$; code: BRL) is the official currency of Brazil.', rate: 5.7 },               
+        { code: 'EUR', description: 'The euro (symbol: €; currency code: EUR) is the official currency of 20 of the 27 member states of the European Union.', rate: 1.15 },
+        { code: 'BTC', description: 'Bitcoin (abbreviation: BTC; sign: ₿) is the first decentralized cryptocurrency. Nodes in the peer-to-peer bitcoin network verify transactions through cryptography and record them in a public distributed ledger, called a blockchain, without central oversight.', rate: 100 },
+        { code: 'ETH', description: 'Ethereum is a decentralized blockchain with smart contract functionality. Ether (Abbreviation: ETH;[a]) is the native cryptocurrency of the platform.', rate: 10 },
     ];
 
     constructor(@InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>) {}
@@ -25,7 +25,7 @@ export class CurrencySeedService implements OnModuleInit {
     private async seedCurrencies() {
         
         for (let currencyData of this.currencies) {
-            const existingCurrency = await this.currencyModel.findOne({ name: currencyData.name }).exec();
+            const existingCurrency = await this.currencyModel.findOne({ code: currencyData.code }).exec();
 
             if (!existingCurrency) {
                 const newCurrency = new this.currencyModel(currencyData);

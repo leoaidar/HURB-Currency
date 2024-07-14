@@ -4,7 +4,7 @@ export class UpdateCurrencyDto {
 
   @IsOptional()
   @IsString()
-  name?: string;
+  code?: string;
 
   @IsOptional()
   @IsNumber()
