@@ -10,30 +10,32 @@ export class ExchangeRateService {
 
   constructor(private configService: ConfigService) {
     this.API_URL = this.configService.get<string>('API_URL');
-  }
-  
+  }  
+ 
   async getExchangeRate(base: string, symbols: string[]): Promise<any> {
+
     const url = `${this.API_URL}/${base.toLowerCase()}.json`;
     this.logger.log(`Public currency quote API call: ${url}`);
 
     try {
       const response = await axios.get(url);
-      const rates = response.data[base.toLowerCase()]; // Access rates under the base currency key
+      // Acessa as taxas sob a chave da moeda base
+      const rates = response.data[base.toLowerCase()]; 
 
       const result = {};
       symbols.forEach(symbol => {
-        // Access rates using exact currency codes as they appear in the API response
         const symbolKey = symbol.toLowerCase();
-        if (rates[symbolKey]) {
+        if (rates && rates[symbolKey]) {
           result[symbolKey] = rates[symbolKey];
         }
       });
 
-      this.logger.log(`Currency conversion rates retrieved: ${JSON.stringify(result)}`);
+      this.logger.log(`Taxas de câmbio obtidas: ${JSON.stringify(result)}`);
       return { rates: result };
     } catch (error) {
-      this.logger.error(`Error fetching exchange rates: ${error}`);
-      throw new Error('Failed to fetch exchange rates');
+      this.logger.error(`Erro ao buscar taxas de câmbio: ${error}`);
+      // Retorna um objeto vazio para indicar falha ao invés de lançar uma exceção
+      return { rates: {} };
     }
   }
 
