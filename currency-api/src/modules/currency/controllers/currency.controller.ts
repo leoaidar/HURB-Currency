@@ -4,6 +4,8 @@ import { ExchangeRateService } from '../services/exchange-rate.service';
 import { CreateCurrencyDto } from '../dto/create-currency.dto';
 import { IdParamDto } from '../dto/id-param.dto';
 import { TransformInterceptor } from '../../../core/interceptors/transform.interceptor';
+import { CurrencyNotFoundException } from 'src/exceptions/currency-not-found.exception';
+import { CurrencyFailedCreateException } from 'src/exceptions/currency-failed-create.exception';
 
 @Controller('currencies')
 export class CurrencyController {
@@ -12,18 +14,23 @@ export class CurrencyController {
     private readonly currencyService: CurrencyService,
     private readonly exchangeRateService: ExchangeRateService
   ) {}
-
+    
   @Post()
+  @UseInterceptors(TransformInterceptor)
   async addCurrency(@Body() createCurrencyDto: CreateCurrencyDto) {
-    return this.currencyService.addCurrency(createCurrencyDto.name, createCurrencyDto.rate);
-  }
+    try {
+      return await this.currencyService.addCurrency(createCurrencyDto.name, createCurrencyDto.rate, createCurrencyDto.description);
+    } catch (error) {      
+      throw new CurrencyFailedCreateException();
+    }
+  }  
 
   @Get(':id')
   @UseInterceptors(TransformInterceptor)
   async getCurrency(@Param() params: IdParamDto) {
     const currency = await this.currencyService.getCurrency(params.id);
     if (!currency) {
-      throw new NotFoundException(`Currency with ID ${params.id} not found`);
+      throw new CurrencyNotFoundException(params.id);
     }
     return currency;
   }  

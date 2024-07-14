@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "lib": ["esnext", "dom"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,

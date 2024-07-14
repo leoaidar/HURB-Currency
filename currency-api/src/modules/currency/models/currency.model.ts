@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 @Schema()
@@ -13,6 +13,10 @@ export class Currency {
 
   @Prop({ required: true })
   rate: number;
+
+  @Prop({ required: true })
+  description: string;
+  
 }
 
 export const CurrencySchema = SchemaFactory.createForClass(Currency);
@@ -21,4 +25,5 @@ export type CurrencyDocument = Document & {
   id: string;
   name: string;
   rate: number;
+  description: string;
 };
