@@ -8,10 +8,12 @@ import { CurrencySeedService } from './services/currency.seed.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Currency.name, schema: CurrencySchema }])
+    MongooseModule.forFeature([
+      { name: Currency.name, schema: CurrencySchema },
+    ]),
   ],
   controllers: [CurrencyController],
-  providers: [CurrencySeedService, CurrencyService, ExchangeRateService]
+  providers: [CurrencySeedService, CurrencyService, ExchangeRateService],
+  exports: [CurrencyService, ExchangeRateService],
 })
-
 export class CurrencyModule {}

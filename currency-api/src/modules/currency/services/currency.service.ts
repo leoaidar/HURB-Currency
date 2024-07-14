@@ -2,13 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Currency, CurrencyDocument } from '../models/currency.model';
+import { ExchangeRateService } from './exchange-rate.service';
 
 @Injectable()
 export class CurrencyService {
   
   private readonly logger = new Logger(CurrencyService.name);
   
-  constructor(@InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>) {}
+  constructor(
+    @InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>,
+    private exchangeRateService: ExchangeRateService 
+  ) {}
 
   // Adicionar uma nova moeda no Mongodb
   async addCurrency(code: string, rate: number, description: string): Promise<Currency> {
@@ -42,6 +46,40 @@ export class CurrencyService {
   // Buscar moedas por uma array de símbolos de cada moeda
   async getCurrenciesBySymbols(symbols: string[]): Promise<Currency[]> {
     return this.currencyModel.find({ code: { $in: symbols } }).exec();
+  }  
+
+  // Atualiza as taxas de câmbio
+  async updateCurrencyRates(currencySymbols?: string[]): Promise<string> {
+    
+    
+    this.logger.log(`currencySymbols[]: ${currencySymbols} `);
+    // Buscar as moedas baseadas nos símbolos enviados ou trazer todas caso veio vazio
+    const currencies = currencySymbols?.length 
+      ? await this.getCurrenciesBySymbols(currencySymbols)
+      : await this.getAllCurrencies();
+
+      
+    this.logger.log(`currencies: ${currencies} `);
+
+    const symbols = currencies.map(c => c.code);
+    
+    // Buscar as taxas de câmbio usando o Dollar(USD) como moeda base 
+    const currencyRates = await this.exchangeRateService.getExchangeRate('USD', symbols);
+
+    if (!currencyRates || !currencyRates.rates) {
+      throw new Error('Failed to fetch exchange rates');
+    }
+
+    // Atualizar cada moeda com a nova taxa
+    await Promise.all(currencies.map(async (currency) => {
+      const newRate = currencyRates.rates[currency.code.toLowerCase()];
+      if (newRate) {
+        await this.updateCurrencyRate(currency.id, newRate);
+        this.logger.log(`Updated ${currency.code.toUpperCase()} with rate ${newRate}`);
+      }
+    }));
+
+    return 'Exchange rates updated successfully';
   }
-  
+
 }
