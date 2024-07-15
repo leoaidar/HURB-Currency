@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import { Model } from 'mongoose';
+import { Currency, CurrencyDocument } from '../models/currency.model';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class ExchangeRateService {
@@ -8,10 +11,13 @@ export class ExchangeRateService {
   private readonly logger = new Logger(ExchangeRateService.name);
   private readonly API_URL: string;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    @InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>
+  ) {
     this.API_URL = this.configService.get<string>('API_URL');
-  }  
- 
+  }
+
   async getExchangeRate(base: string, symbols: string[]): Promise<any> {
 
     const url = `${this.API_URL}/${base.toLowerCase()}.json`;
@@ -20,23 +26,51 @@ export class ExchangeRateService {
     try {
       const response = await axios.get(url);
       // Acessa as taxas sob a chave da moeda base
-      const rates = response.data[base.toLowerCase()]; 
-
+      const rates = response.data[base.toLowerCase()];
       const result = {};
-      symbols.forEach(symbol => {
+
+      // Constrói o retorno deste método
+      for (const symbol of symbols) {
         const symbolKey = symbol.toLowerCase();
         if (rates && rates[symbolKey]) {
           result[symbolKey] = rates[symbolKey];
         }
+      }
+      
+      // Transforma o JSON em uma matriz
+      const rateEntries = Object.entries(rates);
+      // Separa num array somente o símbolo da moeda
+      const currencyArray = rateEntries.map(([currency, rate]) => currency);
+      // Busca no banco quais moedas já existem
+      const existingCurrencies = await this.currencyModel.find({ code: { $in: currencyArray.map(symbol => symbol.toUpperCase()) } });
+      const existingCurrencyMap = existingCurrencies.reduce((currenciesFound, currentElement) => {
+        currenciesFound[currentElement.code.toLowerCase()] = true;
+        return currenciesFound;
+      }, {});      
+
+      // Aproveita para atualizar a base local com novas moedas
+      rateEntries.forEach(async ([currency, rate]) => {        
+        const symbolKey = currency.toLowerCase();
+        // Verifica se a moeda já existe no banco de dados
+        if (!existingCurrencyMap[symbolKey]) {
+          // Se não existir, cria uma nova entrada
+          const newCurrency = new this.currencyModel({
+            code: currency.toUpperCase(),
+            rate: rate,
+            description: `Description saved from External API for ${symbolKey.toUpperCase()}`
+          });
+          await newCurrency.save();
+          this.logger.log(`Nova moeda salva: ${currency.toUpperCase()} com taxa ${rates[symbolKey]}`);
+        }    
       });
 
-      this.logger.log(`Taxas de câmbio obtidas: ${JSON.stringify(result)}`);
+      this.logger.log(`Taxas de câmbio obtidas da API: ${JSON.stringify(result)}`);
       return { rates: result };
     } catch (error) {
       this.logger.error(`Erro ao buscar taxas de câmbio: ${error}`);
       // Retorna um objeto vazio para indicar falha ao invés de lançar uma exceção
       return { rates: {} };
     }
-  }
+  }  
 
 }
