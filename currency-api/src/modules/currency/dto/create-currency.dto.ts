@@ -27,5 +27,6 @@ export class CreateCurrencyDto {
   @IsNumber()
   @Min(0)
   rate: number;  
+  
 }
    

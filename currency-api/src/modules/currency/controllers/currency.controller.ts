@@ -20,12 +20,12 @@ import {
 } from '@nestjs/swagger';
 import { CurrencyService } from '../services/currency.service';
 import { CreateCurrencyDto } from '../dto/create-currency.dto';
+import { UpdateCurrencyDto } from '../dto/update-currency.dto';
 import { IdParamDto } from '../dto/id-param.dto';
 import { TransformInterceptor } from '../../../core/interceptors/transform.interceptor';
-import { CurrencyNotFoundException } from 'src/exceptions/currency-not-found.exception';
-import { CurrencyFailedCreateException } from 'src/exceptions/currency-failed-create.exception';
-import { CurrencyFailedExchangeException } from 'src/exceptions/currency-failed-exchange.exception';
-import { UpdateCurrencyDto } from '../dto/update-currency.dto';
+import { CurrencyNotFoundException } from '../../../exceptions/currency-not-found.exception';
+import { CurrencyFailedCreateException } from '../../../exceptions/currency-failed-create.exception';
+import { CurrencyFailedExchangeException } from '../../../exceptions/currency-failed-exchange.exception';
 
 @ApiTags('currencies')
 @Controller('currencies')

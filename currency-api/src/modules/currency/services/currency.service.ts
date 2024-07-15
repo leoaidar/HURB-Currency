@@ -3,7 +3,7 @@ import { CurrencyInvalidAmountException } from './../../../exceptions/currency-i
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CurrencyFailedCalcExchangeException } from 'src/exceptions/currency-failed-calc-exchange.exception';
+import { CurrencyFailedCalcExchangeException } from './../../../exceptions/currency-failed-calc-exchange.exception';
 import { Currency, CurrencyDocument } from '../models/currency.model';
 import { ExchangeRateService } from './exchange-rate.service';
 import { UpdateCurrencyDto } from '../dto/update-currency.dto';
