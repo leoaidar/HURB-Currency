@@ -13,7 +13,11 @@ import { CurrencyController } from './controllers/currency.controller';
     ]),
   ],
   controllers: [CurrencyController],
-  providers: [CurrencySeedService, CurrencyService, ExchangeRateService],
+  providers: [
+                CurrencySeedService, 
+                CurrencyService, 
+                ExchangeRateService
+            ],
   exports: [CurrencyService, ExchangeRateService],
 })
 export class CurrencyModule {}

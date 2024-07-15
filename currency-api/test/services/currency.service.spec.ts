@@ -1,4 +1,3 @@
-import { CurrencyFailedFetchExchangeException } from './../../src/exceptions/currency-failed-fetch-exchange.exception';
 import { CurrencyFailedCalcExchangeException } from './../../src/exceptions/currency-failed-calc-exchange.exception';
 import { CurrencyInvalidAmountException } from './../../src/exceptions/currency-invalid-amount.exception';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -51,10 +50,6 @@ describe('CurrencyServiceTest', () => {
         {
           provide: ExchangeRateService,
           useValue: mockExchangeRateService 
-          // useValue: {            
-          //   getExchangeRate: jest.fn().mockResolvedValue({ rates: { usd: 1, brl: 5.43, eur: 0.85 } })
-          //   //getExchangeRate: jest.fn().mockRejectedValue(new Error('API error'))
-          // }
         }
       ],
     }).compile();
@@ -162,8 +157,8 @@ describe('CurrencyServiceTest', () => {
     });
     
     it('should convert currency amounts based on BRL rates', async () => {
-      const parsedAmount = 100; // USD
-      const expectedBrl = 543.00; // Expected result in BRL
+      const parsedAmount = 100;
+      const expectedBrl = 543.00;
       jest.spyOn(service, 'convertCurrencyByRateUSD').mockResolvedValue(expectedBrl);
 
       const result = await service.convertCurrency('USD', 'BRL', '100');
@@ -175,12 +170,6 @@ describe('CurrencyServiceTest', () => {
 
       await expect(service.convertCurrency('USD', 'BRL', '100')).rejects.toThrow(CurrencyFailedCalcExchangeException);
     });    
-
-    // it('should handle exceptions when rates are not available', async () => {
-    //   jest.spyOn(service.exchangeRateService, 'getExchangeRate').mockResolvedValue({ rates: {} }); // No rates available
-
-    //   await expect(service.convertCurrency('USD', 'BRL', '100')).rejects.toThrow(CurrencyFailedCalcExchangeException);
-    // });
 
   });
 

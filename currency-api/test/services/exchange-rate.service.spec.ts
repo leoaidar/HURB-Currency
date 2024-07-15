@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { getModelToken } from '@nestjs/mongoose';
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import { Currency } from '../../src/modules/currency/models/currency.model';
 import { ExchangeRateService } from '../../src/modules/currency/services/exchange-rate.service';
 

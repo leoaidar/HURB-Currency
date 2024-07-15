@@ -19,21 +19,20 @@ export class CurrencySeedService implements OnModuleInit {
     constructor(@InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>) {}
 
     async onModuleInit() {
-        await this.seedCurrencies();
-    }
-
-    private async seedCurrencies() {
-        
-        for (let currencyData of this.currencies) {
-            const existingCurrency = await this.currencyModel.findOne({ code: currencyData.code }).exec();
-
-            if (!existingCurrency) {
-                const newCurrency = new this.currencyModel(currencyData);
-                await newCurrency.save();
-            }
-        }
-        
+        const existingCodes = await this.getExistingCurrencyCodes();
+        await this.createMissingCurrencies(existingCodes);
         this.logger.log('Currency seeding populated with success!');
     }
 
+    private async getExistingCurrencyCodes(): Promise<Set<string>> {
+        const currencies = await this.currencyModel.find().select('code').exec();
+        return new Set(currencies.map(c => c.code));
+    }
+
+    private async createMissingCurrencies(existingCodes: Set<string>): Promise<void> {
+        const currenciesToCreate = this.currencies.filter(c => !existingCodes.has(c.code));
+        for (let currency of currenciesToCreate) {
+            await this.currencyModel.create(currency);
+        }
+    }
 }
