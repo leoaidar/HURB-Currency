@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class ExchangeRateService {
-
+  
   private readonly logger = new Logger(ExchangeRateService.name);
   private readonly API_URL: string;
 
@@ -16,6 +16,17 @@ export class ExchangeRateService {
     @InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>
   ) {
     this.API_URL = this.configService.get<string>('API_URL');
+  }
+
+  // Função para mapear moedas existentes
+  createExistingCurrencyMap(existingCurrencies: any[]): Record<string, boolean> {
+    if (!Array.isArray(existingCurrencies)) {
+      return {};
+    }
+    return existingCurrencies.reduce((currenciesFound, currentElement) => {
+      currenciesFound[currentElement.code.toLowerCase()] = true;
+      return currenciesFound;
+    }, {});
   }
 
   async getExchangeRate(base: string, symbols: string[]): Promise<any> {
@@ -43,18 +54,8 @@ export class ExchangeRateService {
       // Busca no banco quais moedas já existem
       const existingCurrencies = await this.currencyModel.find({ code: { $in: currencyArray.map(symbol => symbol.toUpperCase()) } });
 
-      // Função para mapear moedas existentes
-      const createExistingCurrencyMap = (existingCurrencies: any[]) => {
-        if (!Array.isArray(existingCurrencies)) {
-          return {};
-        }
-        return existingCurrencies.reduce((currenciesFound, currentElement) => {
-          currenciesFound[currentElement.code.toLowerCase()] = true;
-          return currenciesFound;
-        }, {});
-      };
+      const existingCurrencyMap = this.createExistingCurrencyMap(existingCurrencies);
 
-      const existingCurrencyMap = createExistingCurrencyMap(existingCurrencies);
       this.logger.log(`existingCurrencyMap: ${JSON.stringify(existingCurrencyMap)}`);
 
       // Aproveita para atualizar a base local com novas moedas
@@ -63,7 +64,7 @@ export class ExchangeRateService {
         // Verifica se a moeda já existe no banco de dados
         if (!existingCurrencyMap[symbolKey]) {
           // Se não existir, cria uma nova entrada
-          const newCurrency = await this.currencyModel.create({
+          await this.currencyModel.create({
             code: currency.toUpperCase(),
             rate: rate,
             description: `Description saved from External API for ${symbolKey.toUpperCase()}`
@@ -80,4 +81,5 @@ export class ExchangeRateService {
       return { rates: {} };
     }
   }
+  
 }
