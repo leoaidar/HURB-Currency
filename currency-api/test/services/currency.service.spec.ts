@@ -18,18 +18,19 @@ describe('CurrencyServiceTest', () => {
       exec: jest.fn().mockResolvedValue(undefined)
     };
 
-    mockModel.findOne.mockReturnValue({
-      exec: jest.fn().mockResolvedValue(undefined)
-    });
-    mockModel.findOneAndUpdate.mockReturnValue({
-      exec: jest.fn().mockResolvedValue(undefined)
-    });
-    mockModel.findOneAndDelete.mockReturnValue({
-      exec: jest.fn().mockResolvedValue(undefined)
-    });
-    mockModel.create.mockReturnValue({
-      exec: jest.fn().mockResolvedValue(undefined)
-    });
+    mockModel.find.mockImplementation(() => ({
+      exec: jest.fn().mockResolvedValue([])
+    }));
+    mockModel.findOne.mockImplementation(() => ({
+      exec: jest.fn().mockResolvedValue(null)
+    }));
+    mockModel.findOneAndUpdate.mockImplementation(() => ({
+      exec: jest.fn().mockResolvedValue(null)
+    }));
+    mockModel.findOneAndDelete.mockImplementation(() => ({
+      exec: jest.fn().mockResolvedValue(null)
+    }));
+    mockModel.create.mockImplementation((currency) => currency);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -40,7 +41,9 @@ describe('CurrencyServiceTest', () => {
         },
         {
           provide: ExchangeRateService,
-          useValue: { getExchangeRate: jest.fn() }
+          useValue: {
+            getExchangeRate: jest.fn().mockResolvedValue({ rates: { eur: 0.85 } })
+          }
         }
       ],
     }).compile();
@@ -56,7 +59,7 @@ describe('CurrencyServiceTest', () => {
   describe('addCurrency', () => {
     it('should successfully add a new currency', async () => {
       const currencyData = { code: 'USD', rate: 1, description: 'US Dollar' };
-      model.create.mockResolvedValue(currencyData); // Simula a criação corretamente
+      model.create.mockResolvedValue(currencyData);
 
       const result = await service.addCurrency(currencyData.code, currencyData.rate, currencyData.description);
       expect(result).toEqual(currencyData);
@@ -93,4 +96,63 @@ describe('CurrencyServiceTest', () => {
     });
   });
 
+  describe('deleteCurrency', () => {
+    it('should delete a currency by id', async () => {
+      model.findOneAndDelete.mockReturnValue({
+        exec: jest.fn().mockResolvedValue({ id: '1', code: 'USD', rate: 1, description: 'US Dollar' })
+      });
+
+      const result = await service.deleteCurrency('1');
+      expect(result.deleted).toBeTruthy();
+      expect(result.message).toBeUndefined();
+    });
+
+    it('should return not found if currency to delete does not exist', async () => {
+      model.findOneAndDelete.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null)
+      });
+
+      const result = await service.deleteCurrency('unknown');
+      expect(result.deleted).toBeFalsy();
+      expect(result.message).toEqual('Currency not found');
+    });
+  });
+
+  describe('convertCurrency', () => {
+    it('should convert currency amounts', async () => {
+      const result = await service.convertCurrency('USD', 'EUR', '100');
+      expect(result.value).toEqual(85);
+    });
+
+    it('should throw an error if invalid amount provided', async () => {
+      await expect(service.convertCurrency('USD', 'EUR', 'invalid'))
+        .rejects
+        .toThrow('Invalid amount provided');
+    });
+  });
+
+  describe('updateCurrency', () => {
+    it('should update an existing currency', async () => {
+      const updateCurrencyDto = { rate: 2, description: 'Updated US Dollar' };
+      const currencyData = { id: '1', code: 'USD', rate: 1, description: 'US Dollar' };
+      model.findOneAndUpdate.mockReturnValue({
+        exec: jest.fn().mockResolvedValue({ ...currencyData, ...updateCurrencyDto })
+      });
+
+      const result = await service.updateCurrency('USD', updateCurrencyDto);
+      expect(result.rate).toEqual(2);
+      expect(result.description).toEqual('Updated US Dollar');
+    });
+
+    it('should return null if the currency to update does not exist', async () => {
+      const updateCurrencyDto = { rate: 2, description: 'Updated US Dollar' };
+      model.findOneAndUpdate.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null)
+      });
+
+      const result = await service.updateCurrency('XYZ', updateCurrencyDto);
+      expect(result).toBeNull();
+    });
+  });  
+  
 });
