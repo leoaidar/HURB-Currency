@@ -27,6 +27,7 @@ describe('ExchangeRateService', () => {
         { code: 'EUR', rate: 0.85, description: 'Euro' }
       ])
     }));
+    
 
     mockModel.find.mockReturnValue({
       exec: jest.fn().mockResolvedValue(undefined)

@@ -19,7 +19,6 @@ export class ExchangeRateService {
   }
 
   async getExchangeRate(base: string, symbols: string[]): Promise<any> {
-
     const url = `${this.API_URL}/${base.toLowerCase()}.json`;
     this.logger.log(`Public currency quote API call: ${url}`);
 
@@ -36,33 +35,42 @@ export class ExchangeRateService {
           result[symbolKey] = rates[symbolKey];
         }
       }
-      
+
       // Transforma o JSON em uma matriz
       const rateEntries = Object.entries(rates);
       // Separa num array somente o símbolo da moeda
       const currencyArray = rateEntries.map(([currency, rate]) => currency);
       // Busca no banco quais moedas já existem
       const existingCurrencies = await this.currencyModel.find({ code: { $in: currencyArray.map(symbol => symbol.toUpperCase()) } });
-      const existingCurrencyMap = existingCurrencies.reduce((currenciesFound, currentElement) => {
-        currenciesFound[currentElement.code.toLowerCase()] = true;
-        return currenciesFound;
-      }, {});      
+
+      // Função para mapear moedas existentes
+      const createExistingCurrencyMap = (existingCurrencies: any[]) => {
+        if (!Array.isArray(existingCurrencies)) {
+          return {};
+        }
+        return existingCurrencies.reduce((currenciesFound, currentElement) => {
+          currenciesFound[currentElement.code.toLowerCase()] = true;
+          return currenciesFound;
+        }, {});
+      };
+
+      const existingCurrencyMap = createExistingCurrencyMap(existingCurrencies);
+      this.logger.log(`existingCurrencyMap: ${JSON.stringify(existingCurrencyMap)}`);
 
       // Aproveita para atualizar a base local com novas moedas
-      rateEntries.forEach(async ([currency, rate]) => {        
+      for (const [currency, rate] of rateEntries) {
         const symbolKey = currency.toLowerCase();
         // Verifica se a moeda já existe no banco de dados
         if (!existingCurrencyMap[symbolKey]) {
           // Se não existir, cria uma nova entrada
-          const newCurrency = new this.currencyModel({
+          const newCurrency = await this.currencyModel.create({
             code: currency.toUpperCase(),
             rate: rate,
             description: `Description saved from External API for ${symbolKey.toUpperCase()}`
           });
-          await newCurrency.save();
           this.logger.log(`Nova moeda salva: ${currency.toUpperCase()} com taxa ${rates[symbolKey]}`);
-        }    
-      });
+        }
+      }
 
       this.logger.log(`Taxas de câmbio obtidas da API: ${JSON.stringify(result)}`);
       return { rates: result };
@@ -71,6 +79,5 @@ export class ExchangeRateService {
       // Retorna um objeto vazio para indicar falha ao invés de lançar uma exceção
       return { rates: {} };
     }
-  }  
-
+  }
 }
