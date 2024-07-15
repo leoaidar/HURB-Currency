@@ -9,6 +9,7 @@ import {
   UsePipes,
   ValidationPipe,
   Put,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,6 +25,7 @@ import { TransformInterceptor } from '../../../core/interceptors/transform.inter
 import { CurrencyNotFoundException } from 'src/exceptions/currency-not-found.exception';
 import { CurrencyFailedCreateException } from 'src/exceptions/currency-failed-create.exception';
 import { CurrencyFailedExchangeException } from 'src/exceptions/currency-failed-exchange.exception';
+import { UpdateCurrencyDto } from '../dto/update-currency.dto';
 
 @ApiTags('currencies')
 @Controller('currencies')
@@ -125,6 +127,47 @@ export class CurrencyController {
       throw new CurrencyFailedExchangeException();
     }
     
+  }
+  
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a currency by ID' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'The ID of the currency to delete',
+  })
+  @ApiResponse({ status: 200, description: 'Currency deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Currency not found' })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async deleteCurrency(@Param() params: IdParamDto) {
+    const result = await this.currencyService.deleteCurrency(params.id);
+    if (!result.deleted) {
+      this.logger.error(`Failed to delete currency with ID ${params.id}`);
+      throw new CurrencyNotFoundException(params.id);
+    }
+    return { message: 'Currency deleted successfully' };
+  }  
+
+  @Put(':code')
+  @ApiOperation({ summary: 'Update a specific currency by code' })
+  @ApiParam({ name: 'code', type: 'string', description: 'Currency code to update' })
+  @ApiBody({ type: UpdateCurrencyDto })
+  @ApiResponse({ status: 200, description: 'Currency updated successfully' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 404, description: 'Currency not found' })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @UseInterceptors(TransformInterceptor)
+  async updateCurrency(
+    @Param('code') code: string,
+    @Body() updateCurrencyDto: UpdateCurrencyDto
+  ) {
+    const result = await this.currencyService.updateCurrency(code, updateCurrencyDto);
+    this.logger.log(`result: ${JSON.stringify(result)}`);
+    if (!result) {
+      this.logger.error(`Falha ao atualizar a moeda com o código ${code}`);
+      throw new CurrencyNotFoundException(code);
+    }
+    return result;
   }  
 
 }

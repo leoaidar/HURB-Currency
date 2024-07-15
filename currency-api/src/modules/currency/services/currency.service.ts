@@ -6,6 +6,7 @@ import { Model } from 'mongoose';
 import { CurrencyFailedCalcExchangeException } from 'src/exceptions/currency-failed-calc-exchange.exception';
 import { Currency, CurrencyDocument } from '../models/currency.model';
 import { ExchangeRateService } from './exchange-rate.service';
+import { UpdateCurrencyDto } from '../dto/update-currency.dto';
 
 @Injectable()
 export class CurrencyService {
@@ -50,6 +51,40 @@ export class CurrencyService {
   async getCurrenciesBySymbols(symbols: string[]): Promise<Currency[]> {
     return this.currencyModel.find({ code: { $in: symbols } }).exec();
   }  
+
+  // Atualizar uma moeda específica pelo código(BRL)
+  async updateCurrency(code: string, updateCurrencyDto: UpdateCurrencyDto): Promise<Currency | null> {
+    this.logger.log(`Atualizando moeda com código: ${code}`);
+    const updatedCurrency = await this.currencyModel.findOneAndUpdate(
+      { code: code },
+      { $set: updateCurrencyDto },
+      { new: true }
+    ).exec();
+    
+    if (!updatedCurrency) {
+      this.logger.log(`Nenhuma moeda encontrada com o código: ${code}`);
+      return null;
+    }
+
+    this.logger.log(`Moeda atualizada com sucesso: ${JSON.stringify(updatedCurrency)}`);
+    return updatedCurrency;
+  }  
+  
+  // Método para remover uma moeda pelo ID
+  async deleteCurrency(id: string): Promise<{ deleted: boolean, message?: string }> {
+    try {
+      const result = await this.currencyModel.findOneAndDelete({ id }).exec();
+      if (!result) {
+        this.logger.log(`Moeda não encontrada para deletar com ID: ${id}`);
+        return { deleted: false, message: 'Currency not found' };
+      }
+      this.logger.log(`Moeda deletada com sucesso com ID: ${id}`);
+      return { deleted: true };
+    } catch (error) {
+      this.logger.error(`Erro ao deletar a moeda com ID: ${id}`, error);
+      return { deleted: false, message: `Erro ao deletar a moeda com ID: ${id}` };
+    }
+  }
 
   // Atualiza as taxas de câmbio
   async updateCurrencyRates(currencySymbols?: string[]): Promise<string> {    
