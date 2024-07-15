@@ -1,12 +1,17 @@
+import { CurrencyFailedFetchExchangeException } from './../../src/exceptions/currency-failed-fetch-exchange.exception';
+import { CurrencyFailedCalcExchangeException } from './../../src/exceptions/currency-failed-calc-exchange.exception';
+import { CurrencyInvalidAmountException } from './../../src/exceptions/currency-invalid-amount.exception';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CurrencyService } from '../../src/modules/currency/services/currency.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { Currency } from '../../src/modules/currency/models/currency.model';
 import { ExchangeRateService } from '../../src/modules/currency/services/exchange-rate.service';
 
+
 describe('CurrencyServiceTest', () => {
   let service: CurrencyService;
   let model: any;
+  let mockExchangeRateService: any;
 
   beforeEach(async () => {
     const mockModel = {
@@ -32,6 +37,10 @@ describe('CurrencyServiceTest', () => {
     }));
     mockModel.create.mockImplementation((currency) => currency);
 
+    mockExchangeRateService = {
+      getExchangeRate: jest.fn().mockResolvedValue({ rates: { usd: 1, brl: 5.43, eur: 0.85 } })
+    };    
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CurrencyService,
@@ -41,9 +50,11 @@ describe('CurrencyServiceTest', () => {
         },
         {
           provide: ExchangeRateService,
-          useValue: {
-            getExchangeRate: jest.fn().mockResolvedValue({ rates: { eur: 0.85 } })
-          }
+          useValue: mockExchangeRateService 
+          // useValue: {            
+          //   getExchangeRate: jest.fn().mockResolvedValue({ rates: { usd: 1, brl: 5.43, eur: 0.85 } })
+          //   //getExchangeRate: jest.fn().mockRejectedValue(new Error('API error'))
+          // }
         }
       ],
     }).compile();
@@ -64,6 +75,11 @@ describe('CurrencyServiceTest', () => {
       const result = await service.addCurrency(currencyData.code, currencyData.rate, currencyData.description);
       expect(result).toEqual(currencyData);
     });
+
+    it('should handle database errors during currency addition', async () => {
+      model.create.mockRejectedValue(new Error('DB error'));
+      await expect(service.addCurrency('USD', 1, 'US Dollar')).rejects.toThrow('DB error');
+    });    
   });
 
   describe('getCurrency', () => {
@@ -93,6 +109,15 @@ describe('CurrencyServiceTest', () => {
 
       const result = await service.updateCurrencyRate('1', newRate);
       expect(result.rate).toEqual(newRate);
+    });
+
+    it('should return null if the currency does not exist', async () => {
+      model.findOneAndUpdate.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null)
+      });
+
+      const result = await service.updateCurrencyRate('unknown', 2);
+      expect(result).toBeNull();
     });
   });
 
@@ -129,6 +154,34 @@ describe('CurrencyServiceTest', () => {
         .rejects
         .toThrow('Invalid amount provided');
     });
+
+    it('should throw an CurrencyInvalidAmountException if invalid amount provided', async () => {
+      await expect(service.convertCurrency('USD', 'EUR', 'invalid'))
+        .rejects
+        .toThrow(CurrencyInvalidAmountException);
+    });
+    
+    it('should convert currency amounts based on BRL rates', async () => {
+      const parsedAmount = 100; // USD
+      const expectedBrl = 543.00; // Expected result in BRL
+      jest.spyOn(service, 'convertCurrencyByRateUSD').mockResolvedValue(expectedBrl);
+
+      const result = await service.convertCurrency('USD', 'BRL', '100');
+      expect(result.value).toEqual(expectedBrl);
+    });
+
+    it('should handle exceptions when rates are not available', async () => {
+      mockExchangeRateService.getExchangeRate.mockResolvedValue({ rates: {} });
+
+      await expect(service.convertCurrency('USD', 'BRL', '100')).rejects.toThrow(CurrencyFailedCalcExchangeException);
+    });    
+
+    // it('should handle exceptions when rates are not available', async () => {
+    //   jest.spyOn(service.exchangeRateService, 'getExchangeRate').mockResolvedValue({ rates: {} }); // No rates available
+
+    //   await expect(service.convertCurrency('USD', 'BRL', '100')).rejects.toThrow(CurrencyFailedCalcExchangeException);
+    // });
+
   });
 
   describe('updateCurrency', () => {
@@ -153,6 +206,6 @@ describe('CurrencyServiceTest', () => {
       const result = await service.updateCurrency('XYZ', updateCurrencyDto);
       expect(result).toBeNull();
     });
-  });  
+  });
   
 });
