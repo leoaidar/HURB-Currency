@@ -20,8 +20,8 @@ export class CurrencyService {
 
   // Adicionar uma nova moeda no Mongodb
   async addCurrency(code: string, rate: number, description: string): Promise<Currency> {
-    const newCurrency = new this.currencyModel({ code, rate, description });
-    return await newCurrency.save();
+    const newCurrency = await this.currencyModel.create({ code, rate, description });
+    return newCurrency;
   }
 
   // Buscar uma moeda pelo ID

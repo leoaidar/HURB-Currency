@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CurrencyController } from './currency.controller';
-import { CurrencyService } from '../services/currency.service';
-import { CreateCurrencyDto } from '../dto/create-currency.dto';
-import { UpdateCurrencyDto } from '../dto/update-currency.dto';
-import { IdParamDto } from '../dto/id-param.dto';
+import { CurrencyController } from '../../src/modules/currency/controllers/currency.controller';
+import { CurrencyService } from '../../src/modules/currency/services/currency.service';
+import { CreateCurrencyDto } from '../../src/modules/currency/dto/create-currency.dto';
+import { UpdateCurrencyDto } from '../../src/modules/currency/dto/update-currency.dto';
+import { IdParamDto } from '../../src/modules/currency/dto/id-param.dto';
 import { NotFoundException } from '@nestjs/common';
 
-describe('CurrencyController', () => {
+describe('CurrencyControllerTest', () => {
   let controller: CurrencyController;
   let service: CurrencyService;
 
@@ -81,11 +81,6 @@ describe('CurrencyController', () => {
   describe('getAllCurrencies', () => {
     it('should retrieve all currencies', async () => {
       const currencies = [
-        { id: '1', code: 'USD', rate: 1, description: 'Dollar' },
-        { id: '2', code: 'EUR', rate: 0.9, description: 'Euro' }
-      ];
-
-      [
         { id: '1', code: 'USD', description: 'The United States dollar (symbol: $; currency code: USD; also abbreviated US$ to distinguish it from other dollar-denominated currencies; referred to as the dollar, U.S. dollar, American dollar, or colloquially buck) is the official currency of the United States and several other countries.', rate: 1 },
         { id: '2', code: 'BRL', description: 'The Brazilian real (pl. reais; sign: R$; code: BRL) is the official currency of Brazil.', rate: 5 },               
         { id: '3', code: 'EUR', description: 'The euro (symbol: €; currency code: EUR) is the official currency of 20 of the 27 member states of the European Union.', rate: 0.9 },
@@ -100,11 +95,24 @@ describe('CurrencyController', () => {
   });
   
   describe('convertCurrency', () => {
-    it('should convert an amount from one currency to another', async () => {
+    it('should convert an amount from one currency USD to EUR', async () => {
       const from = 'USD';
       const to = 'EUR';
       const amount = '100';
       const result = { value: 90 };
+  
+      jest.spyOn(service, 'convertCurrency').mockImplementation(async () => result);
+  
+      expect(await controller.convertCurrency(from, to, amount)).toBe(result);
+    });
+  });
+
+  describe('convertCurrency', () => {
+    it('should convert an amount from one currency USD to BRL', async () => {
+      const from = 'USD';
+      const to = 'EUR';
+      const amount = '1';
+      const result = { value: 5.4 };
   
       jest.spyOn(service, 'convertCurrency').mockImplementation(async () => result);
   
