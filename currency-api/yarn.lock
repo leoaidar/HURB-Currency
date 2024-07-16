@@ -3647,6 +3647,11 @@
   optionalDependencies:
     "graceful-fs" "^4.1.6"
 
+"k6@^0.0.0":
+  "integrity" "sha512-GAQSWayS2+LjbH5bkRi+pMPYyP1JSp7o+4j58ANZ762N/RH/SdlAT3CHHztnn8s/xgg8kYNM24Gd2IPo9b5W+g=="
+  "resolved" "https://registry.npmjs.org/k6/-/k6-0.0.0.tgz"
+  "version" "0.0.0"
+
 "kareem@2.6.3":
   "integrity" "sha512-C3iHfuGUXK2u8/ipq9LfjFfXFxAZMQJJq7vLS45r3D9Y2xQ/m4S8zaR4zMLFWh9AsNPXmcFfUDhTEO8UIC/V6Q=="
   "resolved" "https://registry.npmjs.org/kareem/-/kareem-2.6.3.tgz"

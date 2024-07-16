@@ -127,7 +127,7 @@ export class HealthController {
     try {      
       this.logger.log('Tentando verificar o endpoint interno de microserviço...');
       const currencies = await this.currencyService.getAllCurrencies();
-      this.logger.log('Resposta recebida: ' + JSON.stringify(currencies));
+      this.logger.log('Resposta recebida do microserviço: ' + JSON.stringify(currencies));
       return currencies.length > 0 ? 'UP' : 'DOWN';
     } catch (error) {
       this.logger.error('Falha ao verificar o serviço interno de moeda', error);
