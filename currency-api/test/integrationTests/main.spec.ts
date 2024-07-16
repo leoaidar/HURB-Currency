@@ -11,19 +11,35 @@ describe('ApplicationHURBTest', () => {
     await app.init();
   });
 
-  it('should start and respond to a health check', async () => {
+  it('should start and succefull health check detailed', async () => {
+    const expectedResponse = {
+      currencyQuoteAPI: 'UP',
+      database: 'UP',
+      microservice: 'UP'
+    };
+
     await request(app.getHttpServer())
-      .get('/health/check')
+      .get('/HURB/hc')
       .expect(200)
-      .expect({ status: 'OK' }); 
+      .expect(expectedResponse);
   });
 
-  it('should start and respond service api OK from health check', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/health/check')
-      .expect(200);
-    expect(response.text).toContain('OK');
-  });  
+  it('should respond 500 and error if any service is down', async () => {
+    const expectedErrorResponse = {
+      currencyQuoteAPI: 'DOWN',
+      database: 'UP',
+      microservice: 'UP'
+    };
+
+    await request(app.getHttpServer())
+      .get('/HURB/hc')
+      .expect(500) 
+      .expect({
+        status: 'ERROR',
+        message: 'One or more services are DOWN',
+        healthStatus: expectedErrorResponse
+      });
+  });
 
   afterAll(async () => {
     await app.close();
