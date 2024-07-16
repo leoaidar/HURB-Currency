@@ -1,3 +1,4 @@
+import { HealthController } from './core/controllers/health.controller';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -17,5 +18,7 @@ import { CurrencyModule } from './modules/currency/currency.module';
     }),
     CurrencyModule, // importar somente o CurrencyModule funcionou
   ],
+  controllers: [HealthController], // health-check
+  providers: [],  
 })
 export class AppModule {}

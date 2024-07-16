@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-//import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,22 +15,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  // app.useGlobalPipes(new ValidationPipe({
-  //   whitelist: true, // Remove propriedades que não têm nenhum decorador no DTO
-  //   forbidNonWhitelisted: true, // Rejeita requisições que contêm propriedades não válidas
-  //   transform: true, // Transforma payloads para corresponder aos tipos do DTO
-  //   disableErrorMessages: false, // Mostra mensagens de erro (desabilitar em produção por segurança)
-  // }));
-
-  // app.useGlobalPipes(new ValidationPipe({
-  //   whitelist: true,
-  //   forbidNonWhitelisted: true,
-  //   transform: true,
-  //   disableErrorMessages: false,
-  // }));  
-
   await app.listen(3000);  
-  //const open = (await import('open')).default;
-  //open('http://localhost:3000/api');
 }
 bootstrap();
