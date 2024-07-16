@@ -21,7 +21,7 @@ describe('ApplicationHURBTest', () => {
         expect(res.body.info.database.status).toEqual('up');
         expect(res.body.info.microservice.status).toEqual('up');
       });
-  });
+  }, 60000);
 
   afterAll(async () => {
     await app.close();

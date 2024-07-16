@@ -1,7 +1,5 @@
 import { HealthController } from './core/controllers/health.controller';
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { HttpHealthIndicator, TerminusModule } from '@nestjs/terminus';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CurrencyModule } from './modules/currency/currency.module';
@@ -19,8 +17,6 @@ import { CurrencyModule } from './modules/currency/currency.module';
       inject: [ConfigService],
     }),
     CurrencyModule, // importar somente o CurrencyModule funcionou
-    HttpModule,
-    TerminusModule
   ],
   controllers: [HealthController], // health-check
   providers: [],  
