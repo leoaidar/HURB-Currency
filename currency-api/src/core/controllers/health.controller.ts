@@ -134,33 +134,5 @@ export class HealthController {
       return 'DOWN';
     }
   }
-
-  private async checkInternalAPIRetry(): Promise<string> {
-    return new Promise(resolve => {
-      let attempts = 0;
-      const maxAttempts = 10;
-      const interval = 6000; // 5 segundos entre tentativas
-  
-      const attemptAccess = async () => {
-        try {
-          this.logger.log('Tentando verificar o endpoint interno de microserviço...');
-          const response = await axios.get('http://localhost:3000/currencies', { timeout: 60000 });
-          this.logger.log('Resposta recebida: ' + JSON.stringify(response.data));
-          resolve(response.data.length > 0 ? 'UP' : 'DOWN');
-        } catch (error) {
-          this.logger.error('Tentativa falhou', error);
-          attempts++;
-          if (attempts < maxAttempts) {
-            setTimeout(attemptAccess, interval);
-          } else {
-            this.logger.error('Todas as tentativas falharam');
-            resolve('DOWN');
-          }
-        }
-      };
-  
-      attemptAccess();
-    });
-  }
   
 }
