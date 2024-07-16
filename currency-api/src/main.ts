@@ -10,6 +10,7 @@ async function bootstrap() {
     .setDescription('Documentation of HURB API, which responds to JSON, for currency conversion. It must have a backing currency (USD) and make conversions between different currencies with real and live values.')
     .setVersion('1.0')
     .addTag('currencies')
+    .addTag('HURB')
     .build();
   
   const document = SwaggerModule.createDocument(app, config);
