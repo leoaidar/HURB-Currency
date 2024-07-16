@@ -7,21 +7,24 @@ describe('ApplicationHURBTest', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    app = await NestFactory.create(AppModule);
+    app = await NestFactory.create(AppModule, { logger: console });
     await app.init();
   });
 
   it('should successfully perform a health check with all services UP', async () => {
+    const expectedResponse = {
+      currencyQuoteAPI: 'UP',
+      database: 'UP',
+      microservice: 'UP'
+    };
+
     await request(app.getHttpServer())
       .get('/HURB/hc')
       .expect(200)
       .expect((res) => {
-        expect(res.body.status).toEqual('ok');
-        expect(res.body.info.currencyApi.status).toEqual('up');
-        expect(res.body.info.database.status).toEqual('up');
-        expect(res.body.info.microservice.status).toEqual('up');
+        expect(res.body).toMatchObject(expectedResponse);
       });
-  }, 60000);
+  });
 
   afterAll(async () => {
     await app.close();

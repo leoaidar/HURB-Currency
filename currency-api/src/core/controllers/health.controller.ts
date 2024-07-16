@@ -64,7 +64,6 @@ export class HealthController {
       this.logger.log(`Public currency quote API call: ${url}`);
   
       const response = await axios.get(url);
-      this.logger.log(`HTTP Status: ${response.status}`);
       this.logger.log(`Currency Quote API Data: ${JSON.stringify(response.data)}`);
   
       const rates = response.data && response.data.usd;
@@ -85,7 +84,6 @@ export class HealthController {
   private async checkDatabase(): Promise<string> {
     try {
       this.logger.log('Conectando ao banco de dados...');
-      this.logger.log(`his.MONGO_CONN: ${this.MONGO_CONN}`);
       await connect(this.MONGO_CONN);
       this.logger.log('Conexão com o banco de dados estabelecida.');
       
@@ -126,16 +124,17 @@ export class HealthController {
   }  
 
   private async checkInternalAPI(): Promise<string> {
-    try {
-      this.logger.log('Verificando o serviço interno de moeda...');
+    try {      
+      this.logger.log('Tentando verificar o endpoint interno de microserviço...');
       const currencies = await this.currencyService.getAllCurrencies();
+      this.logger.log('Resposta recebida: ' + JSON.stringify(currencies));
       return currencies.length > 0 ? 'UP' : 'DOWN';
     } catch (error) {
       this.logger.error('Falha ao verificar o serviço interno de moeda', error);
       return 'DOWN';
     }
   }
-    
+
   private async checkInternalAPIRetry(): Promise<string> {
     return new Promise(resolve => {
       let attempts = 0;
