@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import request from 'supertest';
 
-describe('Application HURB', () => {
+describe('ApplicationHURBTest', () => {
   let app: INestApplication;
 
   beforeAll(async () => {

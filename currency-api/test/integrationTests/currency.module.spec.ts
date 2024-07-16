@@ -5,7 +5,7 @@ import { CurrencyModule } from './../../src/modules/currency/currency.module';
 import { ExchangeRateService } from './../../src/modules/currency/services/exchange-rate.service';
 import { CurrencyService } from './../../src/modules/currency/services/currency.service';
 
-describe('CurrencyModule Integration', () => {
+describe('CurrencyModuleIntegrationTest', () => {
   let currencyService: CurrencyService;
   let exchangeRateService: ExchangeRateService;
 
