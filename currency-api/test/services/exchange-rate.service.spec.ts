@@ -17,14 +17,14 @@ describe('ExchangeRateServiceTest', () => {
       find: jest.fn().mockReturnThis(),
       findOneAndUpdate: jest.fn().mockReturnThis(),
       create: jest.fn(),
-      exec: jest.fn().mockResolvedValue([]) 
+      exec: jest.fn().mockResolvedValue([]),
     };
 
     currencyModel.find.mockImplementation(() => ({
       exec: jest.fn().mockResolvedValue([
         { code: 'USD', rate: 1, description: 'US Dollar' },
-        { code: 'EUR', rate: 0.85, description: 'Euro' }
-      ])
+        { code: 'EUR', rate: 0.85, description: 'Euro' },
+      ]),
     }));
 
     const module: TestingModule = await Test.createTestingModule({
@@ -33,13 +33,17 @@ describe('ExchangeRateServiceTest', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn().mockReturnValue('https://latest.currency-api.pages.dev/v1/currencies')
-          }
+            get: jest
+              .fn()
+              .mockReturnValue(
+                'https://latest.currency-api.pages.dev/v1/currencies',
+              ),
+          },
         },
         {
           provide: getModelToken(Currency.name),
-          useValue: currencyModel
-        }
+          useValue: currencyModel,
+        },
       ],
     }).compile();
 
@@ -60,10 +64,7 @@ describe('ExchangeRateServiceTest', () => {
           brl: 5.42,
         },
       };
-      const mockExistingCurrencies = [
-        { code: 'USD' },
-        { code: 'EUR' },
-      ];
+      const mockExistingCurrencies = [{ code: 'USD' }, { code: 'EUR' }];
 
       mockedAxios.get.mockResolvedValue({ data: mockRates });
       currencyModel.find.mockResolvedValue(mockExistingCurrencies);
@@ -126,15 +127,15 @@ describe('ExchangeRateServiceTest', () => {
     });
   });
 
-
   describe('getExchangeRate', () => {
     it('should fetch exchange rates and return formatted data', async () => {
-
       const expectedRates = { usd: 1, brl: 5.4 };
 
-      mockedAxios.get.mockResolvedValue({ data:{ 
-        usd: expectedRates
-      }})      
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          usd: expectedRates,
+        },
+      });
 
       const result = await service.getExchangeRate('USD', ['BRL']);
       expect(result.rates).toEqual({ brl: 5.4 });
@@ -145,7 +146,5 @@ describe('ExchangeRateServiceTest', () => {
       const result = await service.getExchangeRate('ARTH', ['EUR']);
       expect(result.rates).toEqual({});
     });
-    
-  });  
-
+  });
 });

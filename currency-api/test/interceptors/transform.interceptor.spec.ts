@@ -1,4 +1,3 @@
-
 import { ExecutionContext, CallHandler } from '@nestjs/common';
 import { of } from 'rxjs';
 import { TransformInterceptor } from './../../src/core/interceptors/transform.interceptor';
@@ -20,20 +19,30 @@ describe('TransformInterceptorTest', () => {
         switchToHttp: () => ({
           getRequest: () => ({}),
           getResponse: () => ({}),
-          getNext: () => ({})
+          getNext: () => ({}),
         }),
       } as any;
       const next: CallHandler = {
-        handle: () => of({ _id: '1', __v: 0, id: '1', code: 'USD', rate: 1, description: 'US Dollar' })
+        handle: () =>
+          of({
+            _id: '1',
+            __v: 0,
+            id: '1',
+            code: 'USD',
+            rate: 1,
+            description: 'US Dollar',
+          }),
       };
 
-      const result = await interceptor.intercept(mockExecutionContext, next).toPromise();
+      const result = await interceptor
+        .intercept(mockExecutionContext, next)
+        .toPromise();
 
       expect(result).toEqual({
         id: '1',
         code: 'USD',
         rate: 1,
-        description: 'US Dollar'
+        description: 'US Dollar',
       });
     });
 
@@ -42,21 +51,38 @@ describe('TransformInterceptorTest', () => {
         switchToHttp: () => ({
           getRequest: () => ({}),
           getResponse: () => ({}),
-          getNext: () => ({})
+          getNext: () => ({}),
         }),
       } as any;
       const next: CallHandler = {
-        handle: () => of([
-          { _id: '1', __v: 0, id: '1', code: 'USD', rate: 1, description: 'US Dollar' },
-          { _id: '2', __v: 0, id: '2', code: 'EUR', rate: 1.2, description: 'Euro' }
-        ])
+        handle: () =>
+          of([
+            {
+              _id: '1',
+              __v: 0,
+              id: '1',
+              code: 'USD',
+              rate: 1,
+              description: 'US Dollar',
+            },
+            {
+              _id: '2',
+              __v: 0,
+              id: '2',
+              code: 'EUR',
+              rate: 1.2,
+              description: 'Euro',
+            },
+          ]),
       };
 
-      const result = await interceptor.intercept(mockExecutionContext, next).toPromise();
+      const result = await interceptor
+        .intercept(mockExecutionContext, next)
+        .toPromise();
 
       expect(result).toEqual([
         { id: '1', code: 'USD', rate: 1, description: 'US Dollar' },
-        { id: '2', code: 'EUR', rate: 1.2, description: 'Euro' }
+        { id: '2', code: 'EUR', rate: 1.2, description: 'Euro' },
       ]);
     });
   });

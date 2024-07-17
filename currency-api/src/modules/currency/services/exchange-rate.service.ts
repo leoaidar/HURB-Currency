@@ -7,19 +7,20 @@ import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class ExchangeRateService {
-  
   private readonly logger = new Logger(ExchangeRateService.name);
   private readonly API_URL: string;
 
   constructor(
     private configService: ConfigService,
-    @InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>
+    @InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>,
   ) {
     this.API_URL = this.configService.get<string>('API_URL');
   }
 
   // Função para mapear moedas existentes
-  createExistingCurrencyMap(existingCurrencies: any[]): Record<string, boolean> {
+  createExistingCurrencyMap(
+    existingCurrencies: any[],
+  ): Record<string, boolean> {
     if (!Array.isArray(existingCurrencies)) {
       return {};
     }
@@ -50,13 +51,18 @@ export class ExchangeRateService {
       // Transforma o JSON em uma matriz
       const rateEntries = Object.entries(rates);
       // Separa num array somente o símbolo da moeda
-      const currencyArray = rateEntries.map(([currency, rate]) => currency);
+      const currencyArray = rateEntries.map(([currency]) => currency);
       // Busca no banco quais moedas já existem
-      const existingCurrencies = await this.currencyModel.find({ code: { $in: currencyArray.map(symbol => symbol.toUpperCase()) } });
+      const existingCurrencies = await this.currencyModel.find({
+        code: { $in: currencyArray.map((symbol) => symbol.toUpperCase()) },
+      });
 
-      const existingCurrencyMap = this.createExistingCurrencyMap(existingCurrencies);
+      const existingCurrencyMap =
+        this.createExistingCurrencyMap(existingCurrencies);
 
-      this.logger.log(`existingCurrencyMap: ${JSON.stringify(existingCurrencyMap)}`);
+      this.logger.log(
+        `existingCurrencyMap: ${JSON.stringify(existingCurrencyMap)}`,
+      );
 
       // Aproveita para atualizar a base local com novas moedas
       for (const [currency, rate] of rateEntries) {
@@ -67,13 +73,17 @@ export class ExchangeRateService {
           await this.currencyModel.create({
             code: currency.toUpperCase(),
             rate: rate,
-            description: `Description saved from External API for ${symbolKey.toUpperCase()}`
+            description: `Description saved from External API for ${symbolKey.toUpperCase()}`,
           });
-          this.logger.log(`Nova moeda salva: ${currency.toUpperCase()} com taxa ${rates[symbolKey]}`);
+          this.logger.log(
+            `Nova moeda salva: ${currency.toUpperCase()} com taxa ${rates[symbolKey]}`,
+          );
         }
       }
 
-      this.logger.log(`Taxas de câmbio obtidas da API: ${JSON.stringify(result)}`);
+      this.logger.log(
+        `Taxas de câmbio obtidas da API: ${JSON.stringify(result)}`,
+      );
       return { rates: result };
     } catch (error) {
       this.logger.error(`Erro ao buscar taxas de câmbio: ${error}`);
@@ -81,5 +91,4 @@ export class ExchangeRateService {
       return { rates: {} };
     }
   }
-  
 }

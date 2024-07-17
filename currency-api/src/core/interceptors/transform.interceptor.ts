@@ -1,17 +1,21 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import { map } from 'rxjs/operators';
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
-
   intercept(context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
-      map(data => {
+      map((data) => {
         if (Array.isArray(data)) {
-          return data.map(item => this.transformDocument(item));
+          return data.map((item) => this.transformDocument(item));
         }
         return this.transformDocument(data);
-      })
+      }),
     );
   }
 
@@ -19,13 +23,12 @@ export class TransformInterceptor implements NestInterceptor {
     if (response.toObject) {
       response = response.toObject();
     }
-    const { _id, __v, ...result } = response;
     // Construir o objeto explicito para garantir a ordem das propriedades
     return {
       id: response.id,
       code: response.code,
       rate: response.rate,
-      description: response.description
+      description: response.description,
     };
   }
 }

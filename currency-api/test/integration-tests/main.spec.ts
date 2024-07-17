@@ -15,7 +15,7 @@ describe('ApplicationHURBTest', () => {
     const expectedResponse = {
       currencyQuoteAPI: 'UP',
       database: 'UP',
-      microservice: 'UP'
+      microservice: 'UP',
     };
 
     await request(app.getHttpServer())

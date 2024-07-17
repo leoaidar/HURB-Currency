@@ -30,12 +30,9 @@ import { CurrencyFailedExchangeException } from '../../../core/exceptions/curren
 @ApiTags('currencies')
 @Controller('currencies')
 export class CurrencyController {
-  
   private readonly logger = new Logger(CurrencyController.name);
 
-  constructor(
-    private readonly currencyService: CurrencyService
-  ) {}
+  constructor(private readonly currencyService: CurrencyService) {}
 
   @Post()
   @ApiOperation({ summary: 'Add a new currency' })
@@ -93,15 +90,27 @@ export class CurrencyController {
 
   @Get('convert/:from/:to/:amount')
   @ApiOperation({ summary: 'Convert an amount from one currency to another' })
-  @ApiParam({ name: 'from', type: 'string', description: 'Currency code to convert from' })
-  @ApiParam({ name: 'to', type: 'string', description: 'Currency code to convert to' })
-  @ApiParam({ name: 'amount', type: 'string', description: 'Amount to convert' })
+  @ApiParam({
+    name: 'from',
+    type: 'string',
+    description: 'Currency code to convert from',
+  })
+  @ApiParam({
+    name: 'to',
+    type: 'string',
+    description: 'Currency code to convert to',
+  })
+  @ApiParam({
+    name: 'amount',
+    type: 'string',
+    description: 'Amount to convert',
+  })
   @ApiResponse({ status: 200, description: 'Currency conversion result' })
-  @ApiResponse({ status: 400, description: 'Invalid input' })  
+  @ApiResponse({ status: 400, description: 'Invalid input' })
   async convertCurrency(
     @Param('from') from: string,
     @Param('to') to: string,
-    @Param('amount') amount: string
+    @Param('amount') amount: string,
   ) {
     return this.currencyService.convertCurrency(from, to, amount);
   }
@@ -109,26 +118,29 @@ export class CurrencyController {
   @Put('update-rates')
   @ApiOperation({ summary: 'Update currency exchange rates' })
   @ApiBody({
-    description: 'Optional list of currency codes to update, if empty all will be updated.',
+    description:
+      'Optional list of currency codes to update, if empty all will be updated.',
     type: [String],
-    required: false // Declarar explicito o corpo da requisicao como opcional
+    required: false, // Declarar explicito o corpo da requisicao como opcional
   })
-  @ApiResponse({ status: 200, description: 'Exchange rates updated successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Exchange rates updated successfully',
+  })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 500, description: 'Failed to update exchange rates' })
   async updateExchangeRates(@Body() currencySymbols?: string[]) {
-
-    try {      
-      const message = await this.currencyService.updateCurrencyRates(currencySymbols);
+    try {
+      const message =
+        await this.currencyService.updateCurrencyRates(currencySymbols);
       this.logger.log(message);
       return { message };
     } catch (ex) {
       this.logger.error(ex);
       throw new CurrencyFailedExchangeException();
     }
-    
   }
-  
+
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a currency by ID' })
   @ApiParam({
@@ -146,11 +158,15 @@ export class CurrencyController {
       throw new CurrencyNotFoundException(params.id);
     }
     return { message: 'Currency deleted successfully' };
-  }  
+  }
 
   @Put(':code')
   @ApiOperation({ summary: 'Update a specific currency by code' })
-  @ApiParam({ name: 'code', type: 'string', description: 'Currency code to update' })
+  @ApiParam({
+    name: 'code',
+    type: 'string',
+    description: 'Currency code to update',
+  })
   @ApiBody({ type: UpdateCurrencyDto })
   @ApiResponse({ status: 200, description: 'Currency updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -159,15 +175,17 @@ export class CurrencyController {
   @UseInterceptors(TransformInterceptor)
   async updateCurrency(
     @Param('code') code: string,
-    @Body() updateCurrencyDto: UpdateCurrencyDto
+    @Body() updateCurrencyDto: UpdateCurrencyDto,
   ) {
-    const result = await this.currencyService.updateCurrency(code, updateCurrencyDto);
+    const result = await this.currencyService.updateCurrency(
+      code,
+      updateCurrencyDto,
+    );
     this.logger.log(`result: ${JSON.stringify(result)}`);
     if (!result) {
       this.logger.error(`Falha ao atualizar a moeda com o código ${code}`);
       throw new CurrencyNotFoundException(code);
     }
     return result;
-  }  
-
+  }
 }

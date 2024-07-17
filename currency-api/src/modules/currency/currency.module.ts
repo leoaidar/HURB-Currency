@@ -9,7 +9,7 @@ import { CurrencySeedService } from './services/currency.seed.service';
 
 @Module({
   imports: [
-    ConfigModule, 
+    ConfigModule,
     MongooseModule.forFeature([
       { name: Currency.name, schema: CurrencySchema },
     ]),

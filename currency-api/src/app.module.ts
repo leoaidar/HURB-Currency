@@ -19,6 +19,6 @@ import { CurrencyModule } from './modules/currency/currency.module';
     CurrencyModule, // importar somente o CurrencyModule funcionou
   ],
   controllers: [HealthController], // health-check
-  providers: [],  
+  providers: [],
 })
 export class AppModule {}

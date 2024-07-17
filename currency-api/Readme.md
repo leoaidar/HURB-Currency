@@ -210,9 +210,9 @@ curl -X 'POST' \
   -H 'accept: */*' \
   -H 'Content-Type: application/json' \
   -d '{
-  "code": "GTA$1",
-  "rate": 2.5,
-  "description": "GRAND THEFT AUTO CRYPTO"
+  "code": "HURB",
+  "description": "HURB CRYPTO",
+  "rate": 0.40
 }'
 ```
 - Add a new currency
@@ -231,9 +231,9 @@ curl -X 'POST' \
   -H 'accept: */*' \
   -H 'Content-Type: application/json' \
   -d '{
-  "code": "HURB",
-  "description": "HURB CRYPTO",
-  "rate": 0.40
+  "code": "GTA$1",
+  "rate": 2.5,
+  "description": "GRAND THEFT AUTO CRYPTO"
 }'
 ```
 
@@ -317,6 +317,37 @@ curl -X 'GET' \
 
 
 
+# Health Check Endpoint
+
+### This Microservice health-check: 
+
+
+**GET /HURB/hc**
+- `currencyQuoteAPI`: Makes a request to an external API using Axios to verify that the Brazilian currency (BRL) exchange rate is available and valid.
+
+
+- `database`: Connects to MongoDB, creates a temporary record, retrieves and deletes it. This method tests all basic CRUD functionality.
+
+
+- `microservice`: Makes a call to the internal endpoint that lists the currencies to verify that the microservice is operating correctly.
+
+
+  - Possible Response:  ``{
+  "currencyQuoteAPI": "UP",
+  "database": "UP",
+  "microservice": "UP"
+}``
+
+Example:
+```
+curl -X 'GET' \
+  'http://localhost:3000/HURB/hc' \
+  -H 'accept: */*'
+```
+
+![Currency Endpoints](snapshot-health-check.png)
+
+
 
 # Swagger
 
@@ -327,21 +358,15 @@ curl -X 'GET' \
 # TSLint
 TSLint is a code linter that helps catch minor code quality and style issues.
 
-## TSLint rules
-All rules are configured through `tslint.json`.
-
-
 ## Running TSLint
 To run TSLint you can call the main build script or just the TSLint task.
 ```
-npm run build:live   // runs full build including TSLint
 npm run lint  // runs only TSLint
 ```
 
+## License
 
-# Common Issues
+Nest is [MIT licensed](LICENSE).
 
-## npm install fails
-The current solution has an example for using a private npm repository. if you want to use the public npm repository, remove the .npmrc file.
 
 
