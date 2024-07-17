@@ -355,6 +355,31 @@ curl -X 'GET' \
 
 ![Currency Endpoints](snapshot-swagger.png)
 
+
+# Additional Batch Update Rates Endpoint
+
+### Update batch currency exchange rates: 
+
+**GET /currencies/update-rates**
+- Its possible update a specific currency like [ "BTC" ] or all currencies, just sending an empty body and will update batch currency exchange rates.
+
+  - Possible Response:  ``{
+  "message": "Exchange rates updated successfully"
+}``
+
+Example:
+```
+curl -X 'PUT' \
+  'http://localhost:3000/currencies/update-rates' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json'
+```
+
+![Update All](snapshot-update-rates-all.png)
+
+![Update Specific](snapshot-update-rate-btc.png)
+
+
 # TSLint
 TSLint is a code linter that helps catch minor code quality and style issues.
 
@@ -367,6 +392,3 @@ npm run lint  // runs only TSLint
 ## License
 
 Nest is [MIT licensed](LICENSE).
-
-
-

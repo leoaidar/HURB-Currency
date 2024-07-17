@@ -355,6 +355,31 @@ curl -X 'GET' \
 
 ![Currency Endpoints](snapshot-swagger.png)
 
+
+# Additional Batch Update Rates Endpoint
+
+### Update batch currency exchange rates: 
+
+**GET /currencies/update-rates**
+- Its possible update a specific currency or all currencies send an empty body and will update batch currency exchange rates.
+
+  - Possible Response:  ``{
+  "message": "Exchange rates updated successfully"
+}``
+
+Example:
+```
+curl -X 'PUT' \
+  'http://localhost:3000/currencies/update-rates' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json'
+```
+
+![Update All](snapshot-update-rates-all.png)
+
+![Update Specific](snapshot-update-rate-btc.png)
+
+
 # TSLint
 TSLint is a code linter that helps catch minor code quality and style issues.
 
@@ -368,5 +393,10 @@ npm run lint  // runs only TSLint
 
 Nest is [MIT licensed](LICENSE).
 
-
+[Nest] 15704  - 17/07/2024, 16:55:20     LOG [ExchangeRateService] Taxas de câmbio obtidas da API: {"btc":0.0000152201}
+[Nest] 15704  - 17/07/2024, 16:55:20     LOG [CurrencyService] Resposta da API: {"rates":{"btc":0.0000152201}}
+[Nest] 15704  - 17/07/2024, 16:55:20     LOG [CurrencyService] Updating currency rate... id: 56f9ade0-36fa-475a-9b76-7e33e4fa372c, rate: 0.0000152201
+[Nest] 15704  - 17/07/2024, 16:55:20     LOG [CurrencyService] Atualizando a taxa da moeda... ID: 56f9ade0-36fa-475a-9b76-7e33e4fa372c, taxa: 0.0000152201
+[Nest] 15704  - 17/07/2024, 16:55:20     LOG [CurrencyService] Updated BTC with rate 0.0000152201
+[Nest] 15704  - 17/07/2024, 16:55:20     LOG [CurrencyController] Exchange rates updated successfully
 
