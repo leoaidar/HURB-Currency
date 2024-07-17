@@ -1,5 +1,5 @@
-import { CurrencyFailedCalcExchangeException } from './../../src/exceptions/currency-failed-calc-exchange.exception';
-import { CurrencyInvalidAmountException } from './../../src/exceptions/currency-invalid-amount.exception';
+import { CurrencyFailedCalcExchangeException } from '../../src/core/exceptions/currency-failed-calc-exchange.exception';
+import { CurrencyInvalidAmountException } from '../../src/core/exceptions/currency-invalid-amount.exception';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CurrencyService } from '../../src/modules/currency/services/currency.service';
 import { getModelToken } from '@nestjs/mongoose';

@@ -23,9 +23,9 @@ import { CreateCurrencyDto } from '../dto/create-currency.dto';
 import { UpdateCurrencyDto } from '../dto/update-currency.dto';
 import { IdParamDto } from '../dto/id-param.dto';
 import { TransformInterceptor } from '../../../core/interceptors/transform.interceptor';
-import { CurrencyNotFoundException } from '../../../exceptions/currency-not-found.exception';
-import { CurrencyFailedCreateException } from '../../../exceptions/currency-failed-create.exception';
-import { CurrencyFailedExchangeException } from '../../../exceptions/currency-failed-exchange.exception';
+import { CurrencyNotFoundException } from '../../../core/exceptions/currency-not-found.exception';
+import { CurrencyFailedCreateException } from '../../../core/exceptions/currency-failed-create.exception';
+import { CurrencyFailedExchangeException } from '../../../core/exceptions/currency-failed-exchange.exception';
 
 @ApiTags('currencies')
 @Controller('currencies')
