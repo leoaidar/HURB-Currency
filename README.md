@@ -48,7 +48,8 @@ This project uses the following environment variables (.env):
 
 
 # Pre-requisites
-- Install [Node.js](https://nodejs.org/en/) version 20.15.1
+- Install [Node.js](https://nodejs.org/en/) version executed in environment development: `20.15.1`
+- Install [Docker](https://docs.docker.com/engine/install/) version executed in environment development: `2.3.0.4`
 
 
 # Getting started
@@ -64,15 +65,19 @@ This project uses the following environment variables (.env):
     ```bash
     npm install
     ```
-4. **Build and run the project:**
+4. **Start docker image mongodb:**
+    ```bash
+    docker run --name mongodb --restart=always -d -p 27017:27017 mongodb/mongodb-community-server:6.0-ubi8
+    ```    
+5. **Build and run the project:**
     ```bash
     npm start
     ```
-5. **Access the application via:**
+6. **Access the application via:**
 
     Navigate to <a href="http://localhost:3000"  target="_blank">http://localhost:3000</a>
     
-6. **API Documentation:**
+7. **API Documentation:**
 
     Access the Swagger UI endpoint at please [http://localhost:3000/api](http://localhost:3000/api)  to interact with the API documentation. Navigate to 
     
