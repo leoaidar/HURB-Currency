@@ -53,22 +53,22 @@ This project uses the following environment variables (.env):
 
 
 # Getting started
-1. **Clone the repository:**
-    ```bash
-    git clone https://github.com/leoaidar/HURB-Currency
-    ```
-2. **Navigate to the project directory:**  
-    ```bash
-    cd currency-api
-    ```
-3. **Install dependencies:**
-    ```bash
-    npm install
-    ```
-4. **Start docker image mongodb:**
+1. **Start docker image mongodb:**
     ```bash
     docker run --name mongodb --restart=always -d -p 27017:27017 mongodb/mongodb-community-server:6.0-ubi8
     ```    
+2. **Clone the repository:**
+    ```bash
+    git clone https://github.com/leoaidar/HURB-Currency
+    ```
+3. **Navigate to the project directory:**  
+    ```bash
+    cd currency-api
+    ```
+4. **Install dependencies:**
+    ```bash
+    npm install
+    ```
 5. **Build and run the project:**
     ```bash
     npm start
