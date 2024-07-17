@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, new ExpressAdapter());
 
   const config = new DocumentBuilder()
     .setTitle('Documentation - Currency HURB API')
@@ -17,6 +18,11 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+  // Inserindo uma rota raiz diretamente através do adaptador Express para devolver no http://localhost:3000
+  app.getHttpAdapter().get('/', (req, res) => {
+    res.json({ message: 'HURB-Microservice-Currency It Works!' });
+  });
 
   await app.listen(3000);
 }
