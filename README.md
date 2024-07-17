@@ -318,102 +318,11 @@ curl -X 'GET' \
 
 
 
-
-
-
-
-
 # Swagger
 
-### Highlights of the swagger.yaml File
+## Microservice Currency Endpoints
 
-**The request must receive as parameters: The source currency, the amount to be converted and the final currency:**
-- /hello:
-  
-  Specifies how users should be routed when they make a request to this endpoint.
-- x-swagger-router-controller: helloWorldRoute
-
-  Specifies  which code file acts as the controller for this endpoint.
-- get:
-
-  Specifies the method being requested (GET, PUT, POST, etc.).
-- operationId: hello
-  
-  Specifies the direct method to invoke for this endpoint within the controller/router 
-- parameters:
-  
-   This section defines the parameters of your endpoint. They can be defined as path, query, header, formData, or body.
-- definitions:
-   
-   This section defines the structure of objects used in responses or as parameters.
-## Swagger Middleware
-The project is using npm module `swagger-tools` that provides middleware functions for metadata, security, validation and routing, and bundles Swagger UI into Express.
-```
-swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
-        // Interpret Swagger resources and attach metadata to request - must be first in swagger-tools middleware chain
-        app.use(middleware.swaggerMetadata());
-
-        // Validate Swagger requests
-        app.use(middleware.swaggerValidator({}));
-
-        // Route validated requests to appropriate controller
-        app.use(middleware.swaggerRouter(options));
-       
-        // Serve the Swagger documents and Swagger UI
-        app.use(middleware.swaggerUi());
-        cb();
-
-    })
-```
-- Metadata
-
-  Swagger extends the Express request object, so that each route handler has access to incoming parameters that have been parsed based on the spec, as well as additional Swagger-generated information from the client.
-
-  Any incoming parameters for the API call will be available in `req.swagger` regardless of whether they were transmitted using query, body, header, etc.
-
-- Validator
-
-  Validation middleware will only route requests that match paths in Swagger specification exactly in terms of endpoint path, request mime type, required and optional parameters, and their declared types.
-
-- Swagger Router
-
-  The Swagger Router connects the Express route handlers found in the controller files on the path specified, with the paths defined in the Swagger specification (swagger.yaml). The routing looks up the correct controller file and exported function based on parameters added to the Swagger spec for each path.
-
-  Here is an example for a hello world endpoint:
-
-  ```
-  paths:
-  /hello:
-      get:
-      x-swagger-router-controller: helloWorldRoute
-      operationId: helloWorldGet
-      tags:
-        - /hello
-      description: >-
-        Returns the current weather for the requested location using the
-        requested unit.
-      parameters:
-        - name: greeting
-          in: query
-          description: Name of greeting
-          required: true
-          type: string
-      responses:
-        '200':
-          description: Successful request.
-          schema:
-            $ref: '#/definitions/Hello'
-        default:
-          description: Invalid request.
-          schema:
-            $ref: '#/definitions/Error'
-  ```
-The fields `x-swagger-router-controller` will point the middleware to a `helloWorldRoute.ts` file in the route's directory, while the `operationId` names the handler function to be invoked.
-
-- Swagger UI
-
-  The final piece of middleware enables serving of the swagger-ui interface direct from the Express server. It also serves the raw Swagger schema (.json) that clients can consume. Paths for both are configurable.
-  The swagger-ui endpoint is acessible at /docs endpoint.
+![Currency Endpoints](snapshot-swagger.png)
 
 # TSLint
 TSLint is a code linter that helps catch minor code quality and style issues.

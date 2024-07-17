@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Documentation - Currenc HURB API')
+    .setTitle('Documentation - Currency HURB API')
     .setDescription('Documentation of HURB API, which responds to JSON, for currency conversion. It must have a backing currency (USD) and make conversions between different currencies with real and live values.')
     .setVersion('1.0')
     .addTag('currencies')
