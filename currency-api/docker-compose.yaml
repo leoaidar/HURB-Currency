@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - API_URL=https://latest.currency-api.pages.dev/v1/currencies
+      - MONGO_CONN=mongodb://mongo:27017/CurrencyDB
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
