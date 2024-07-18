@@ -11,6 +11,6 @@ services:
       - API_URL=https://latest.currency-api.pages.dev/v1/currencies
       - MONGO_CONN=mongodb://mongo:27017/CurrencyDB
   mongo:
-    image: mongo
+    image: mongodb/mongodb-community-server:6.0-ubi8
     ports:
       - "27017:27017"
