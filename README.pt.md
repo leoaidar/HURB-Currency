@@ -95,7 +95,7 @@ Este projeto utiliza as seguintes variáveis de ambiente (.env):
     ```    
 
 # Sobre o projeto: Node JS + TypeScript + Nest JS + Mongoose + MongoDB + Jest + Artillery + Swagger
-Usei o NestJS, um excelente framework que já fornece algumas pré-configurações para Node.js com TypeScript, rotas, Injeção de Dependência e uma separação lógica clara entre as camadas do projeto, o que me poupou tempo de desenvolvimento, permitindo-me focar bastante nos requisitos funcionais e não funcionais do projeto. Não utilizei código boilerplate, apenas a criação inicial do projeto com "nest new currency-api"; toda a estrutura adicional e arquivos foram criados manualmente sem código boilerplate. Utilizei o MongoDB, um banco de dados NoSQL, e o Mongoose como ORM, já que é mais adequado para trabalhar com esse banco de dados, e criei um Seed para popular algumas moedas dentro do Banco de Dados. Os testes estão separados dos scripts principais em uma pasta específica de testes, utilizei o Jest para testes de unidade e integração, bem como testes de cobertura. Usei o Artillery para testes de estresse, que se integra muito bem ao Node.js e é configurável via arquivo YAML. Usei o Swagger (OpenAPI) para documentação ao vivo do microsserviço, e além disso, muito do código está comentado para melhor entendimento dos algoritmos. Quanto à arquitetura de software, a estrutura que escolhi é referida como uma estrutura modular ou estrutura baseada em domínio, especialmente adequada para aplicações que utilizam frameworks modernos. Ela é influenciada pelos princípios de Arquitetura Limpa e Design Orientado ao Domínio (DDD), embora eu tenha simplificado para corresponder à escala e ao escopo dos microserviços de conversão de moedas.
+Usei o NestJS, um excelente framework que já fornece algumas pré-configurações para Node.js com TypeScript, rotas, Injeção de Dependência e uma separação lógica clara entre as camadas do projeto, o que me poupou tempo de desenvolvimento, permitindo-me focar bastante nos requisitos funcionais e não funcionais do projeto. Não utilizei código boilerplate, apenas a criação inicial do projeto com "nest new currency-api"; toda a estrutura adicional e arquivos foram criados manualmente sem código boilerplate. Utilizei o MongoDB, um banco de dados NoSQL, e o Mongoose como ORM, já que é mais adequado para trabalhar com esse banco de dados, e criei um Seed para popular algumas moedas dentro do Banco de Dados. Os testes estão separados dos scripts principais em uma pasta específica de testes, utilizei o Jest para testes de unidade e integração, bem como testes de cobertura. Usei o Artillery para testes de estresse, que se integra muito bem ao Node.js e é configurável via arquivo YAML. Usei o Swagger (OpenAPI) para documentação ao vivo do microsserviço, e além disso, muito do código está comentado para melhor entendimento dos algoritmos. Quanto à arquitetura de software, a estrutura que escolhi é referida como uma estrutura modular ou estrutura baseada em domínio, especialmente adequada para aplicações que utilizam frameworks modernos. Ela é influenciada pelos princípios de Arquitetura Limpa(Clean Architecture) e Design Orientado ao Domínio(DDD), embora eu tenha simplificado para corresponder à escala e ao escopo dos microserviços de conversão de moedas.
 
 ## Estrutura do Projeto
 A estrutura de pastas do `currency-api` é explicada abaixo:
@@ -152,36 +152,8 @@ Essa estrutura garante que cada parte da aplicação seja separada de uma maneir
     artillery run stress_test.yml
     ```
 
-# Testes
-1. **Temos Testes Unitários, Testes de Integração, Teste de Estresse, Relatório de Teste de Estresse e Relatório de Cobertura de Testes.**
-    ```bash
-    "jest": "29.5.0",
-    "artillery": "2.0.17"
-    ```
 
-2. **Executando Testes Unitários e de Integração usando Scripts NPM + Jest:**  
-    ```bash
-    npm run test
-    ```
-
-3. **Executando Teste com Relatório de Cobertura usando Scripts NPM + Jest:**
-    ```bash
-    npm run test --coverage
-    ```
-
-![Relatório de Cobertura](snapshot-final-test-coverage.png)
-
-4. **Executando Teste de Estresse com Relatório de Teste de Estresse usando Scripts NPM + Artillery:**
-    ```bash
-    npm start
-    ```
-
-5. **Iniciar Artillery no mesmo caminho do projeto (currency-api) mas em outro terminal:**
-    ```bash
-    npm install -g artillery
-    artillery run stress_test.yml
-    ```
-# Destaques de endpoints
+# Endpoints principais
 
 ### Requisito: A requisição deverá receber como parâmetros: A moeda de origem, o valor a ser convertido e a moeda final:
 **GET /currencies/convert/{from}/{to}/{amount}**
@@ -345,8 +317,8 @@ curl -X 'GET' \
 Exemplo:
 ```
 curl -X 'GET' \
- 'http://localhost:3000/HURB/hc' \
- -H 'aceitar: */*'
+  'http://localhost:3000/HURB/hc' \
+  -H 'accept: */*'
 ```
 
 ![Endpoints de Moeda](snapshot-health-check.png)
@@ -357,7 +329,7 @@ curl -X 'GET' \
 
 ![Endpoints de Moeda](snapshot-swagger.png)
 
-# Ponto Final Adicional de Atualização de Taxas em Lote
+# Endpoint Adicional de Atualização de Taxas em Lote
 
 ### Atualizar taxas de câmbio em lote:
 
