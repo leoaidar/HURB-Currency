@@ -327,6 +327,9 @@ curl -X 'GET' \
 ### This Microservice health-check: 
 
 
+  -  [http://localhost:3000/HURB/hc](http://localhost:3000/HURB/hc) 
+
+
 **GET /HURB/hc**
 - `currencyQuoteAPI`: Makes a request to an external API using Axios to verify that the Brazilian currency (BRL) exchange rate is available and valid.
 

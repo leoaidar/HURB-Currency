@@ -112,6 +112,19 @@ export class CurrencyService {
     }
   }
 
+  // Função para mapear moedas existentes
+  createExistingCurrencyMap(
+    existingCurrencies: any[],
+  ): Record<string, boolean> {
+    if (!Array.isArray(existingCurrencies)) {
+      return {};
+    }
+    return existingCurrencies.reduce((currenciesFound, currentElement) => {
+      currenciesFound[currentElement.code.toLowerCase()] = true;
+      return currenciesFound;
+    }, {});
+  }  
+
   // Atualiza as taxas de câmbio
   async updateCurrencyRates(currencySymbols?: string[]): Promise<string> {
     this.logger.log(`currencySymbols[]: ${currencySymbols} `);
@@ -135,6 +148,39 @@ export class CurrencyService {
     if (!currencyRates || !currencyRates.rates) {
       throw new CurrencyFailedFetchExchangeException();
     }
+
+    // Transforma o JSON em uma matriz
+    const rateEntries = Object.entries(currencyRates.rates);
+    // Separa num array somente o símbolo da moeda
+    const currencyArray = rateEntries.map(([currency]) => currency);    
+    // Busca no banco quais moedas já existem
+    const existingCurrencies = await this.currencyModel.find({
+      code: { $in: currencyArray.map((symbol) => symbol.toUpperCase()) },
+    });
+
+    const existingCurrencyMap =
+      this.createExistingCurrencyMap(existingCurrencies);
+
+    this.logger.log(
+      `existingCurrencyMap: ${JSON.stringify(existingCurrencyMap)}`,
+    );
+
+    // Aproveita para atualizar a base local com novas moedas
+    for (const [currency, rate] of rateEntries) {
+      const symbolKey = currency.toLowerCase();
+      // Verifica se a moeda já existe no banco de dados
+      if (!existingCurrencyMap[symbolKey]) {
+        // Se não existir, cria uma nova entrada
+        await this.currencyModel.create({
+          code: currency.toUpperCase(),
+          rate: rate,
+          description: `Description saved from External API for ${symbolKey.toUpperCase()}`,
+        });
+        this.logger.log(
+          `Nova moeda salva: ${currency.toUpperCase()} com taxa ${currencyRates.rates[symbolKey]}`,
+        );
+      }
+    }    
 
     // Atualizar cada moeda com a nova taxa
     await Promise.all(
