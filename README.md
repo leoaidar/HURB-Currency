@@ -82,6 +82,20 @@ This project uses the following environment variables (.env):
     Access the Swagger UI endpoint at please [http://localhost:3000/api](http://localhost:3000/api)  to interact with the API documentation. Navigate to 
     
 
+# Scenario: The code needs to run on macOS or Ubuntu (preferably as a Docker container):
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/leoaidar/HURB-Currency
+    ```
+2. **Navigate to the project directory:**  
+    ```bash
+    cd currency-api
+    ```
+3. **Start docker-compose.yaml:**
+    ```bash
+    docker-compose up
+    ```    
+
 # About project: Node JS + TypeScript + Nest JS + Mongoose + MongoDB + Jest + Artillery + Swagger
 I used NestJS, an excellent framework that already provides some pre-configurations for Node.js with TypeScript, routes, Dependency Injection, and a clear logical separation between the layers of the project, which saved me some development time allowing me to focus heavily on the functional requirements and non-functional requirements of the project. No boilerplate code was used, just the initial creation of the project with "nest new currency-api"; all further structure and files were manually created without boilerplate code. I utilized MongoDB, a NoSQL database, and Mongoose as the ORM since it's best suited for working with this database, it was created a Seed to populate some currencies inside Database. The tests are separated from main scripts at specific folder test, I employed Jest for unit and integration testing as well as coverage testing. I used Artillery for stress testing, which integrates very well with Node.js and is configurable via a YAML file. I used Swagger (OpenAPI) for live documentation of the microservice, and additionally, a lot of the code is commented for a better understanding of the algorithms. Regarding the software architecture, the structure I chose is referred to as a modular structure or domain-based structure, especially suited for applications using modern frameworks. It is influenced by the principles of Clean Architecture and Domain-Driven Design (DDD), although I simplified it to match the scale and scope of the currency conversion microservices.
 
@@ -168,6 +182,12 @@ This structure ensures that each part of the application is separated in a clear
     ```bash
     npm run test --coverage
     ```
+
+    
+![Coverage Report](snapshot-final-test-coverage.png)
+
+    
+
 4. **Running Stress Test with Stress Test Report using NPM Scripts + Artillery:**
     ```bash
     npm start
@@ -307,7 +327,7 @@ curl -X 'GET' \
 # 
 ### Requirement: The API needs to include real and current quotes through integration with public currency quote APIs: 
 **GET /currencies/convert/{from}/{to}/{amount}**
-- Converts an amount from one currency to another. As they known currencies so get directly from currency quote API: "https://latest.currency-api.pages.dev/v1/currencies/usd.json".
+- Converts an amount from one currency to another. As they known currencies so get directly from currency quote API: [https://latest.currency-api.pages.dev/v1/currencies/usd.json](https://latest.currency-api.pages.dev/v1/currencies/usd.json).
   - Possible Response:  ``{
   "value": 54.26
 }``
@@ -359,7 +379,7 @@ curl -X 'GET' \
 
 # Swagger
 
-## Microservice Currency Endpoints
+## Overview Microservice Currency Endpoints
 
 ![Currency Endpoints](snapshot-swagger.png)
 

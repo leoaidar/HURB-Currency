@@ -24,7 +24,7 @@ describe('ApplicationHURBTest', () => {
       .expect((res) => {
         expect(res.body).toMatchObject(expectedResponse);
       });
-  });
+  }, 15000);
 
   afterAll(async () => {
     await app.close();

@@ -1,3 +1,4 @@
+import { CurrencyFailedFetchExchangeException } from '../../src/core/exceptions/currency-failed-fetch-exchange.exception';
 import { CurrencyFailedCalcExchangeException } from '../../src/core/exceptions/currency-failed-calc-exchange.exception';
 import { CurrencyInvalidAmountException } from '../../src/core/exceptions/currency-invalid-amount.exception';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -162,6 +163,15 @@ describe('CurrencyServiceTest', () => {
       expect(result.deleted).toBeFalsy();
       expect(result.message).toEqual('Currency not found');
     });
+
+    it('should handle not found for delete operation', async () => {
+      model.findOneAndDelete.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      });
+      const result = await service.deleteCurrency('fake_id');
+      expect(result.deleted).toBeFalsy();
+      expect(result.message).toEqual('Currency not found');
+    });
   });
 
   describe('convertCurrency', () => {
@@ -204,6 +214,20 @@ describe('CurrencyServiceTest', () => {
         service.convertCurrency('USD', 'BRL', '100'),
       ).rejects.toThrow(CurrencyFailedCalcExchangeException);
     });
+
+    it('should throw error if rate not found locally', async () => {
+      mockExchangeRateService.getExchangeRate.mockResolvedValue({ rates: {} });
+      model.find.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) });
+      await expect(
+        service.convertCurrency('USD', 'EUR', '100'),
+      ).rejects.toThrow(CurrencyFailedCalcExchangeException);
+    });
+
+    it('should throw error if input amount is invalid', async () => {
+      await expect(
+        service.convertCurrency('USD', 'EUR', 'invalid'),
+      ).rejects.toThrow(CurrencyInvalidAmountException);
+    });
   });
 
   describe('updateCurrency', () => {
@@ -234,6 +258,53 @@ describe('CurrencyServiceTest', () => {
 
       const result = await service.updateCurrency('XYZ', updateCurrencyDto);
       expect(result).toBeNull();
+    });
+  });
+
+  describe('createExistingCurrencyMap', () => {
+    it('should create a map of existing currencies', () => {
+      const existingCurrencies = [
+        { code: 'USD', rate: 1, description: 'US Dollar' },
+        { code: 'EUR', rate: 0.9, description: 'Euro' },
+      ];
+      const expectedMap = {
+        usd: true,
+        eur: true,
+      };
+
+      const result = service.createExistingCurrencyMap(existingCurrencies);
+      expect(result).toEqual(expectedMap);
+    });
+
+    it('should return an empty map if no currencies are provided', () => {
+      const result = service.createExistingCurrencyMap([]);
+      expect(result).toEqual({});
+    });
+
+    it('should handle cases where input is not an array', () => {
+      const result = service.createExistingCurrencyMap(null);
+      expect(result).toEqual({});
+    });
+  });
+
+  describe('updateCurrencyRates', () => {
+    it('should throw exception when external API fails', async () => {
+      mockExchangeRateService.getExchangeRate.mockRejectedValue(
+        new CurrencyFailedFetchExchangeException(),
+      );
+      await expect(service.updateCurrencyRates(['ARTH'])).rejects.toThrow(
+        CurrencyFailedFetchExchangeException,
+      );
+    });
+
+    it('should handle empty symbols and fetch all currencies', async () => {
+      mockExchangeRateService.getExchangeRate.mockResolvedValue({
+        rates: { usd: 1 },
+      });
+      model.find.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) });
+      await expect(service.updateCurrencyRates()).resolves.toEqual(
+        'Exchange rates updated successfully',
+      );
     });
   });
 });
