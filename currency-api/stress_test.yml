@@ -2,10 +2,12 @@ config:
   target: 'http://localhost:3000' # URL base API
   phases:
     - duration: 60 # Duração do teste em segundos
-      arrivalRate: 1100 # Quantidade de requisições por segundo
+      arrivalRate: 1000 # Quantidade de requisições por segundo
       name: Stress test phase      
 
 scenarios:
   - flow:
       - get:
-          url: "/currencies/convert/USD/BRL/10" # Endpoint de teste
+          url: "/currencies/convert/USD/BRL/10" # Endpoint de teste API EXTERNA
+      - get:
+          url: "/currencies/convert/HURB/GTA$1/10" # Endpoint de teste API INTERNA

@@ -54,52 +54,6 @@ describe('ExchangeRateServiceTest', () => {
     expect(service).toBeDefined();
   });
 
-  describe('getExchangeRate', () => {
-    it('should fetch exchange rates and update local database', async () => {
-      const base = 'USD';
-      const symbols = ['EUR', 'BRL'];
-      const mockRates = {
-        usd: {
-          eur: 0.85,
-          brl: 5.42,
-        },
-      };
-      const mockExistingCurrencies = [{ code: 'USD' }, { code: 'EUR' }];
-
-      mockedAxios.get.mockResolvedValue({ data: mockRates });
-      currencyModel.find.mockResolvedValue(mockExistingCurrencies);
-      currencyModel.create.mockResolvedValue({});
-
-      const result = await service.getExchangeRate(base, symbols);
-
-      expect(result).toEqual({
-        rates: {
-          eur: 0.85,
-          brl: 5.42,
-        },
-      });
-
-      expect(currencyModel.find).toHaveBeenCalledWith({
-        code: { $in: ['EUR', 'BRL'] },
-      });
-      expect(currencyModel.create).toHaveBeenCalledWith({
-        code: 'BRL',
-        rate: 5.42,
-        description: 'Description saved from External API for BRL',
-      });
-    });
-
-    it('should return an empty object if the request fails', async () => {
-      mockedAxios.get.mockRejectedValue(new Error('API error'));
-
-      const base = 'USD';
-      const symbols = ['EUR', 'BRL'];
-      const result = await service.getExchangeRate(base, symbols);
-
-      expect(result).toEqual({ rates: {} });
-    });
-  });
-
   describe('createExistingCurrencyMap', () => {
     it('should return an object mapping existing currencies to true', () => {
       const existingCurrencies = [

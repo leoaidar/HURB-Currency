@@ -123,7 +123,7 @@ export class CurrencyService {
       currenciesFound[currentElement.code.toLowerCase()] = true;
       return currenciesFound;
     }, {});
-  }  
+  }
 
   // Atualiza as taxas de câmbio
   async updateCurrencyRates(currencySymbols?: string[]): Promise<string> {
@@ -152,7 +152,7 @@ export class CurrencyService {
     // Transforma o JSON em uma matriz
     const rateEntries = Object.entries(currencyRates.rates);
     // Separa num array somente o símbolo da moeda
-    const currencyArray = rateEntries.map(([currency]) => currency);    
+    const currencyArray = rateEntries.map(([currency]) => currency);
     // Busca no banco quais moedas já existem
     const existingCurrencies = await this.currencyModel.find({
       code: { $in: currencyArray.map((symbol) => symbol.toUpperCase()) },
@@ -180,7 +180,7 @@ export class CurrencyService {
           `Nova moeda salva: ${currency.toUpperCase()} com taxa ${currencyRates.rates[symbolKey]}`,
         );
       }
-    }    
+    }
 
     // Atualizar cada moeda com a nova taxa
     await Promise.all(

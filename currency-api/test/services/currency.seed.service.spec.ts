@@ -47,7 +47,7 @@ describe('CurrencySeedServiceTest', () => {
         exec: jest.fn().mockResolvedValue([]),
       });
       await service.onModuleInit();
-      expect(mockModel.create).toHaveBeenCalledTimes(5);
+      expect(mockModel.create).toHaveBeenCalledTimes(7);
     });
 
     it('should seed missing currencies', async () => {
@@ -56,7 +56,7 @@ describe('CurrencySeedServiceTest', () => {
         exec: jest.fn().mockResolvedValue([{ code: 'USD' }, { code: 'EUR' }]),
       });
       await service.onModuleInit();
-      expect(mockModel.create).toHaveBeenCalledTimes(3);
+      expect(mockModel.create).toHaveBeenCalledTimes(5);
     });
 
     it('should not create currencies if all initial currencies already exist', async () => {
@@ -70,6 +70,8 @@ describe('CurrencySeedServiceTest', () => {
             { code: 'BRL' },
             { code: 'BTC' },
             { code: 'ETH' },
+            { code: 'HURB' },
+            { code: 'GTA$1' },
           ]),
       });
       await service.onModuleInit();

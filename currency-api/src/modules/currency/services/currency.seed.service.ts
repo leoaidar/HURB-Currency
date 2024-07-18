@@ -38,6 +38,16 @@ export class CurrencySeedService implements OnModuleInit {
         'Ethereum is a decentralized blockchain with smart contract functionality. Ether (Abbreviation: ETH;[a]) is the native cryptocurrency of the platform.',
       rate: 10,
     },
+    {
+      code: 'HURB',
+      description: 'HOTEL URBANO CRYPTO HURB.',
+      rate: 0.5,
+    },
+    {
+      code: 'GTA$1',
+      description: 'GRAND THEFT AUTO CRYPTO GTA$1',
+      rate: 10,
+    },
   ];
 
   constructor(
